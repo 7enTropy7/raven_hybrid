@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Graph Details
+                </div>
+                <div class="card-body">
+                    {% if graph_dict != None %}
+                    <h5 class="card-title">Graph Id:{{ graph_dict.id }}</h5>
+                    <div class="card-text">
+                        <div>
+                            Status: {{ graph_dict.status | title }}
+                        </div>
+                        <div>
+                            Created At: {{ graph_dict.created_at.strftime('%d-%m-%Y %H:%M:%S') }}
+                        </div>
+                        <a href="/viz/graph/ops/{{ graph_dict.id }}/">Check Operations(Ops)</a>
+                    </div>
+
+                    {% else %}
+                    
+                    <h5 class="card-title">Graph Id: N/A</h5>
+                    <div class="card-text">
+                        <div>
+                            Status: N/A
+                        </div>
+                        <div>
+                            Created At: N/A
+                        </div>
+                    </div>    
+                    
+                    {% endif %}
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock content %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container m-lg-4">
+<br>
+<h3>Ravsock Visualize Endpoints</h1>
+<h4>Client</h4>
+<li><a href="/viz/clients/">/viz/clients/</a> [Lists All Clients]</li>
+<br>
+<br>
+<h4>Graph</h4>
+<li><a href="/viz/graphs/">/viz/graphs/</a> [Lists All Graphs]</li>
+<li><a href="#">/viz/graph/ops/{graph_id}/</a> [Ops Associate With Given Graph] </li>
+<li><a href="#">/viz/graph/{graph_id}/</a> [Specific Graph Info]</li>
+<br>
+<br>
+<h4>Ops</h4>
+<li><a href="/viz/ops/">/viz/ops/</a> [Lists All Ops]</li>
+<li><a href="#">/viz/ops/{op_id}/</a> [Specific Op Info]</li>
+<br>
+<br>
+
+</div>
+   
+{% endblock content %}

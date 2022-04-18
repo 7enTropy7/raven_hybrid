@@ -1,0 +1,44 @@
+{% extends 'base.html' %} {% block content %}
+
+<hr />
+<h3 class="text-center mt-3">CLIENTS</h3>
+
+<div class="container mb-5 table-responsive">
+  <h6 class="text-right">Total : {{ clients_dicts|length }}</h6>
+  <table id="myTable" class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Client ID</th>
+        <th scope="col">Client IP</th>
+        <th scope="col">Status</th>
+        <th scope="col">Reporting</th>
+        <th scope="col">FTP Credentials</th>
+        <th scope="col">Context</th>
+        <th scope="col">Connected At</th>
+        <th scope="col">Last Time Active</th>
+        <th scope="col">Disconnected At</th>
+        <th scope="col">Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for client in clients_dicts %}
+      <tr>
+        <th scope="row">{{ client.id }}</th>
+        <td>{{ client.cid }}</td>
+        <td>{{ client.client_ip }}</td>
+        <td>{{ client.status }}</td>
+        <td>{{ client.reporting }}</td>
+        <td>{{ client.ftp_credentials }}</td>
+        <td>{{ client.context }}</td>
+        <td>{{ client.connected_at.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+        <td>{{ client.last_active_time.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+        <td>{{ client.disconnected_at.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+        <td>{{ client.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% endblock content %}
+</div>

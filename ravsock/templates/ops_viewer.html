@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Op Details
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Op ID : {{ op_dict.id }}</h5>
+                    <div class="card-text">
+                        <div>Name : {{ op_dict.name }}</div>
+                        <br/>
+                        <div>Graph :
+                            <a href="/viz/graph/{{ op_dict.graph_id }}/">Graph({{ op_dict.graph_id }})</a>
+                        </div>
+                        <br/>
+                        {% if op_dict.inputs != None %}
+
+                        <div> Inputs :
+                          {% for op_id in op_dict.inputs %}
+                          <a href="/viz/ops/{{ op_id }}/">Op({{ op_id }})</a>
+                          {% endfor %}
+                        </div>
+              
+                        {% else %}
+              
+                        <div>Inputs : None</div>
+              
+                        {% endif %} 
+                        
+                        <br>
+                        
+                        {% if op_dict.outputs != None %}
+              
+                        <div> Outputs:
+                          {% for data_id in op_dict.outputs %}
+                          <a href="/viz/data/{{ data_id }}/">Data({{ data_id }})</a>
+                          {% endfor %}
+                        </div>
+              
+                        {% else %}
+              
+                        <div>Outputs : None</div>
+              
+                        {% endif %}
+                        <br/>
+                        <div>Node Type : {{ op_dict.node_type|title }}</div>
+                        <br/>
+                        <div>Op Type : {{ op_dict.op_type|title }}</div>
+                        <br/>
+                        <div>Operator : {{ op_dict.operator|title }}</div>
+                        <br/>
+                        <div>Status : {{ op_dict.status|title }}</div>
+                        <br/>
+                        <div>Params : {{ op_dict.params|title }}</div>
+                        <br/>
+                        <div>Message : {{ op_dict.message }}</div>
+                        <br/>
+                        <div>Created At : {{ op_dict.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</div>
+                        <br/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock content %}

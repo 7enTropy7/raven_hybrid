@@ -1,0 +1,75 @@
+{% extends 'base.html' %} {% block content %}
+
+<hr />
+<h3 class="text-center mt-3">OPERATIONS (Ops)</h3>
+
+<div class="container mb-5 table-responsive">
+  <h6 class="text-right">Total : Total:{{ ops_dicts|length }}</h6>
+  <table id="myTable" class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th scope="col">OP(ID)</th>
+        <th scope="col">Graph(ID)</th>
+        <th scope="col">Name</th>
+        <th scope="col">Status</th>
+        <th scope="col">Operator</th>
+        <th scope="col">Op Type</th>
+        <th scope="col">Node Type</th>
+        <th scope="col">Inputs</th>
+        <th scope="col">Outputs</th>
+        <th scope="col">Params</th>
+        <th scope="col">Message</th>
+        <th scope="col">Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for op in ops_dicts %}
+      <tr>
+        <th scope="row">
+          <a href="/viz/ops/{{ op.id }}/">Op({{ op.id }})</a>
+        </th>
+        <td>
+          <a href="/viz/graph/{{ op.graph_id }}/">Graph({{ op.graph_id }})</a>
+        </td>
+        <td>{{ op.name|title }}</td>
+        <td>{{ op.status|title }}</td>
+
+        <td>{{ op.operator|title }}</td>
+        <td>{{ op.op_type|title }}</td>
+        <td>{{ op.node_type|title }}</td>
+
+        {% if op.inputs != None %}
+
+        <td>
+          {% for op_id in op.inputs %}
+          <a href="/viz/ops/{{ op_id }}/">Op({{ op_id }})</a>
+          {% endfor %}
+        </td>
+
+        {% else %}
+
+        <td>None</td>
+
+        {% endif %} {% if op.outputs != None %}
+
+        <td>
+          {% for data_id in op.outputs %}
+          <a href="/viz/data/{{ data_id }}/">Data({{ data_id }})</a>
+          {% endfor %}
+        </td>
+
+        {% else %}
+
+        <td>None</td>
+
+        {% endif %}
+
+        <td>{{ op.params }}</td>
+        <td>{{ op.message }}</td>
+        <td>{{ op.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock content %}

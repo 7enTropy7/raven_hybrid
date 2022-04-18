@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Data Details
+                </div>
+                <div class="card-body">
+                    
+                    {% if data_dict != None %}
+
+                    <h5 class="card-title">Data ID:{{ data_dict.id }}</h5>
+                    <div class="card-text">
+                        <div>Dtype : {{ data_dict.dtype }}</div>
+                        <div>Filepath : <a href="{{ data_dict.file_path }}">{{ data_dict.file_path }}</a></div>
+                        <div>Value : {{ data_dict.value }}</div>
+                        <div>Created At: {{ data_dict.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</div>
+                    </div>
+
+                    {% else %}
+
+                    <h5 class="card-title">Data Id: None</h5>
+                    <div class="card-text">
+                        <div>Dtype : None</div>
+                        <div>Filepath : None </div>
+                        <div>Value : None </div>
+                        <div>Created At: None</div>
+                    </div>
+                    
+                    {% endif %}
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+{% endblock content %}

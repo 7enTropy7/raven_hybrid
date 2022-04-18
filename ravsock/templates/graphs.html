@@ -1,0 +1,40 @@
+{% extends 'base.html' %} {% block content %}
+
+<hr />
+<h3 class="text-center mt-3">GRAPHS</h3>
+
+<div class="container mb-5 table-responsive">
+  <h6 class="text-right">Total : {{ graph_dicts|length }}</h6>
+  <table id="myTable" class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Graph ID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Algorithm</th>
+        <th scope="col">Approach</th>
+        <th scope="col">Inputs</th>
+        <th scope="col">Outputs</th>
+        <th scope="col">Rules</th>
+        <th scope="col">Status</th>
+        <th scope="col">Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for graph in graph_dicts %}
+      <tr>
+        <td>{{ graph.id|title }}</td>
+        <td><a href="/viz/graph/{{ graph.id }}/">{{ graph.name|title }}</a></td>
+        <td>{{ graph.algorithm|title }}</td>
+        <td>{{ graph.approach}}</td>
+        <td>{{ graph.inputs}}</td>
+        <td>{{ graph.outputs}}</td>
+        <td>{{ graph.rules}}</td>
+        <td>{{ graph.status}}</td>
+        <td>{{ graph.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% endblock content %}
+</div>
