@@ -12,11 +12,11 @@ from .config import DEFAULT_OPTIONS
 def create_server_app_and_cors():
     # Create an async socket server
     sio = socketio.AsyncServer(
-        async_mode="aiohttp", async_handlers=True, logger=False, cors_allowed_origins="*", ping_timeout=600, max_http_buffer_size=(1024**2)*30
+        async_mode="aiohttp", async_handlers=True, logger=False, cors_allowed_origins="*", ping_timeout=600, max_http_buffer_size=(1024**2)*100
     )
 
     # Creates a new Aiohttp Web Application
-    app = web.Application(client_max_size=(1024**2)*30)
+    app = web.Application(client_max_size=(1024**2)*100)
 
     app['static_root_url'] = '/static'
     STATIC_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "ravjs")

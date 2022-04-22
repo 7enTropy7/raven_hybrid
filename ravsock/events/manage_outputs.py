@@ -13,7 +13,7 @@ from ..config import CONTEXT_FOLDER, PARAMS_FOLDER, FTP_RAVOP_FILES_PATH
 from ..db import ravdb
 from ..ftp import get_client
 from ..globals import globals as g
-from ..utils import OpStatus, MappingStatus, GraphStatus, dump_data, get_logger
+from ..utils import OpStatus, MappingStatus, GraphStatus, dump_data, dump_data_non_ftp, get_logger
 
 logger = get_logger()
 
@@ -41,31 +41,46 @@ async def subgraph_completed(sid, results_list):
         data = json.loads(data)
         print("\nResult received: op_type: {}, operator: {}, op_id: {}, status: {}".format(data['op_type'],data['operator'],data['op_id'],data['status']))
 
-        op_id = data["op_id"]
+        if "file_name" not in data:
+            op_id = data["op_id"]
+            op = ravdb.get_op(op_id)
+            if data["status"] == "success":
+                data_obj = ravdb.create_data(dtype="ndarray")
+                result_array = np.array(data["result"])
+                file_path = dump_data_non_ftp(data_obj.id, result_array, data["username"])
+                ravdb.update_data(data_obj, file_path=file_path, file_size=result_array.size*result_array.itemsize)
+                # Update op
+                ravdb.update_op(
+                    op, outputs=json.dumps([data_obj.id]), status=OpStatus.COMPUTED
+                )
+        
+        else:
 
-        op = ravdb.get_op(op_id)
+            op_id = data["op_id"]
 
-        if data["status"] == "success":
-            data_obj = ravdb.create_data(dtype="ndarray")
-            # file_path = dump_data(data_obj.id, value=np.array(data["result"]))
-            temp_file_name = str(data["file_name"])
+            op = ravdb.get_op(op_id)
 
-            username = str(data['username'])
+            if data["status"] == "success":
+                data_obj = ravdb.create_data(dtype="ndarray")
+                # file_path = dump_data(data_obj.id, value=np.array(data["result"]))
+                temp_file_name = str(data["file_name"])
 
-            file_path_dir = FTP_RAVOP_FILES_PATH + '/' + str(username) + '/'
+                username = str(data['username'])
 
-            temp_file_path = file_path_dir + temp_file_name
+                file_path_dir = FTP_RAVOP_FILES_PATH + '/' + str(username) + '/'
 
-            new_file_path = file_path_dir + 'data_' + str(data_obj.id) + '.npy' 
+                temp_file_path = file_path_dir + temp_file_name
 
-            os.rename(temp_file_path, new_file_path)
+                new_file_path = file_path_dir + 'data_' + str(data_obj.id) + '.npy' 
 
-            ravdb.update_data(data_obj, file_path=new_file_path)
+                os.rename(temp_file_path, new_file_path)
 
-            # Update op
-            ravdb.update_op(
-                op, outputs=json.dumps([data_obj.id]), status=OpStatus.COMPUTED
-            )
+                ravdb.update_data(data_obj, file_path=new_file_path)
+
+                # Update op
+                ravdb.update_op(
+                    op, outputs=json.dumps([data_obj.id]), status=OpStatus.COMPUTED
+                )
 
             # subgraph_id = op.subgraph_id
     

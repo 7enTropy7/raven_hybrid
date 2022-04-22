@@ -501,21 +501,29 @@ class Data(ParentClass):
         # else:
         #     kwargs['value'] = value
         if id is None:
-
+             
             if value is not None:
                 value = convert_to_ndarray(value)
-                dtype = value.dtype
-                kwargs['dtype'] = str(dtype)
-                kwargs['username'] = ftp_username
+
+                byte_size = value.size * value.itemsize
+                if byte_size > 10 * 1000000:
+                    dtype = value.dtype
+                    kwargs['dtype'] = str(dtype)
+                    kwargs['username'] = ftp_username
                 # if kwargs.get("value", None) is not None:
                 #     kwargs['value'] = "uploaded in FTP"
+                else:
+                    dtype = value.dtype
+                    kwargs['dtype'] = str(dtype)
+                    kwargs['value'] = value.tolist()
+                    kwargs['username'] = ftp_username
 
         super().__init__(id, **kwargs)
         # print("Username and password: ", ftp_username, ftp_password)
         # print("Check ftp creds: ",check_credentials(ftp_username,ftp_password))
 
         if id is None:
-            if value is not None:
+            if value is not None and byte_size > 10 * 1000000:
                 #value = convert_to_ndarray(value)
                 file_path = dump_data(self.id, value)
                 ftp_client.upload(file_path, os.path.basename(file_path))

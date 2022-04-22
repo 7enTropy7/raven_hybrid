@@ -337,19 +337,28 @@ def create_payload(op, cid):
             # value = {"value": output.tolist()}
             data_id = ast.literal_eval(input_op.outputs)[0]
             op_data_obj = ravdb.get_data(data_id)
-            op_data_path = op_data_obj.file_path
+            
+            if op_data_obj.file_size is not None:
+                output = ravdb.get_op_output(op_id)
+                if output is not None:
+                    value = {"value": output.tolist()}
+                else:
+                    value = {"op_id": op_id}
 
-            src = op_data_path
-            dst = FTP_RAVOP_FILES_PATH + '/' + str(cid) + '/' + os.path.basename(op_data_path)
-            to_delete = False
-            if src != dst:
-                copy_thread = threading.Thread(target=copy_file, args=(src, dst))
-                copy_thread.start()
-                to_delete = True
+            else:
+                op_data_path = op_data_obj.file_path
 
-            file_path_list = op_data_path.split('/')[-2:]
-            file_path = '/'.join(file_path_list)
-            value = {"value": op_id, "path": '/'+file_path, "to_delete": str(to_delete)}
+                src = op_data_path
+                dst = FTP_RAVOP_FILES_PATH + '/' + str(cid) + '/' + os.path.basename(op_data_path)
+                to_delete = False
+                if src != dst:
+                    copy_thread = threading.Thread(target=copy_file, args=(src, dst))
+                    copy_thread.start()
+                    to_delete = True
+
+                file_path_list = op_data_path.split('/')[-2:]
+                file_path = '/'.join(file_path_list)
+                value = {"value": op_id, "path": '/'+file_path, "to_delete": str(to_delete)}
         else:
             value = {"op_id": op_id}
         values.append(value)

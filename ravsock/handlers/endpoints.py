@@ -17,6 +17,7 @@ from ..config import BASE_DIR
 from ..db import ravdb
 from ..utils import (
     dump_data,
+    dump_data_non_ftp,
     copy_data,
     convert_to_ndarray,
     load_data_from_file,
@@ -299,44 +300,33 @@ async def data_create(request):
     """
     try:
         data = await request.json()
-        # print("Request data:", data, type(data))
-        # value = convert_to_ndarray(data["value"])
-        dtype = data['dtype']#str(value.dtype)
-        username = data['username']
-        # print(type(dtype), dtype)
-        data = ravdb.create_data(dtype=dtype)
-        # print("TYPE ===", type(data), "DATA == ", data)
 
-        # if dtype == "ndarray":
-        #     file_path = dump_data(data.id, value)
-        #     # Update file path
-        #     ravdb.update_data(data, file_path=file_path)
-        # elif dtype in ["int", "float"]:
+        if 'value' in data:
+            value = convert_to_ndarray(data["value"])
+            username = data['username']
+            dtype = data['dtype']
+            data = ravdb.create_data(dtype=dtype)
+            file_path = dump_data_non_ftp(data.id, value, username)
+            ravdb.update_data(data, file_path=file_path, file_size=value.size*value.itemsize)
+            data_dict = serialize(data)
 
-        file_path = os.path.join(FTP_RAVOP_FILES_PATH, "{}/data_{}.npy".format(username,data.id))#dump_data(data.id, value)
-        # Update file path
-        ravdb.update_data(data, file_path=file_path)
+            if data.file_path is not None:
+                data_dict["value"] = value.tolist()
 
-        # ravdb.update_data(data, value=value)
+        else:
 
-        # elif dtype == "file":
-        #     filepath = os.path.join(
-        #         os.path.join(BASE_DIR, "files"), "data_{}_{}".format(data.id, value)
-        #     )
-        #     copy_data(source=value, destination=filepath)
-        #     ravdb.update_data(data, file_path=filepath)
-
-        # Serialize db object
-        data_dict = serialize(data)
-
-        # if data.file_path is not None:
-        #     data_dict["value"] = load_data_from_file(data.file_path).tolist()
+            dtype = data['dtype']
+            username = data['username']
+            data = ravdb.create_data(dtype=dtype)
+            file_path = os.path.join(FTP_RAVOP_FILES_PATH, "{}/data_{}.npy".format(username,data.id))
+            # Update file path
+            ravdb.update_data(data, file_path=file_path)
+            # Serialize db object
+            data_dict = serialize(data)
 
         # Remove datetime key
         del data_dict["created_at"]
         del data_dict["file_path"]
-
-        # print("TYPE == ", type(data), data_dict)
 
         return web.json_response(data_dict, content_type="application/json", status=200)
 

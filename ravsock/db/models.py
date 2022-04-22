@@ -45,6 +45,7 @@ class Data(Base):
     dtype = Column(String(20), nullable=False)
     file_path = Column(String(200), nullable=True)
     value = Column(String(100), nullable=True)
+    file_size = Column(Integer, nullable=True)
 
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 

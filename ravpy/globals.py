@@ -60,6 +60,10 @@ class Globals(object):
     def cid(self, cid):
         self._cid = cid
 
+    @ops.setter
+    def ops(self, ops):
+        self._ops = ops
+
     @property
     def client(self):
         if self._cid is None:
@@ -96,5 +100,9 @@ class Globals(object):
     @has_subgraph.setter
     def has_subgraph(self, has_subgraph):
         self._has_subgraph = has_subgraph
+
+    @outputs.setter
+    def outputs(self, outputs):
+        self._outputs = outputs
 
 g = Globals.Instance()

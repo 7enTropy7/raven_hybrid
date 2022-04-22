@@ -10,6 +10,8 @@ import numpy as np
 from sqlalchemy.orm import class_mapper
 from sqlalchemy_utils import database_exists
 
+from ravpy.config import FTP_DOWNLOAD_FILES_FOLDER
+
 from .logger import get_logger
 from .strings import *
 from .strings import Operators
@@ -69,6 +71,17 @@ def dump_data(data_id, value):
     Dump ndarray to file
     """
     file_path = os.path.join(DATA_FILES_PATH, "data_{}.npy".format(data_id))
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    np.save(file_path, value)
+    return file_path
+
+def dump_data_non_ftp(data_id, value, username):
+    """
+    Dump ndarray to file
+    """
+    file_path = os.path.join(FTP_RAVOP_FILES_PATH, "{}/data_{}.npy".format(username,data_id))
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
