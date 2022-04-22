@@ -45,7 +45,7 @@ FTP_SERVER_USERNAME = "ubuntu"
 FTP_SERVER_PASSWORD = "******"
 
 FTP_SERVER_DIR = "{}/ravftp".format(Path(__file__).parent.parent)
-FTP_ENVIRON_DIR = "/opt/homebrew/Caskroom/miniforge/base/envs/rdf/bin"
+FTP_ENVIRON_DIR = "{}/miniforge3/envs/rdf/bin".format(str(Path.home()))
 FTP_RAVOP_FILES_PATH = os.path.join(expanduser("~"), "rdf/ravftp/files")
 
 MAX_OP_CLIENT_MAPPING = 3

@@ -6,6 +6,8 @@ import os
 import threading
 import requests
 import aiohttp_jinja2
+import numpy as np
+import datetime
 
 from ..db import RavQueue
 from ..utils import OpStatus, find_complexity_and_output_dims
@@ -25,7 +27,7 @@ from ..utils import (
     find_dtype,
     get_op_stats)
 
-from ..events.scheduler import final_scheduler_call
+from ..events.scheduler import final_scheduler_call, emit_op
 
 from ..utils import get_random_string
 
@@ -1012,3 +1014,94 @@ async def add_developer(request):
             "password": password
         }, content_type="application/json", status=200
     )
+
+#Subgraph completed handler for requests
+
+async def subgraph_completed_request(request):
+    # http://localhost:9999/subgraph/completed/?cid=1
+    try:
+        client_cid = request.rel_url.query['cid']
+        results_list = await request.json()
+        
+        results_list = json.loads(results_list)
+    
+        # subgraph_id = None
+        
+        print('RESULTS_LIST: \n\n\n\n\n',results_list)
+        for data in results_list:
+            data = json.loads(data)
+            print("\nResult received: op_type: {}, operator: {}, op_id: {}, status: {}".format(data['op_type'],data['operator'],data['op_id'],data['status']))
+
+            if "file_name" not in data:
+                op_id = data["op_id"]
+                op = ravdb.get_op(op_id)
+                if data["status"] == "success":
+                    data_obj = ravdb.create_data(dtype="ndarray")
+                    result_array = np.array(data["result"])
+                    file_path = dump_data_non_ftp(data_obj.id, result_array, data["username"])
+                    ravdb.update_data(data_obj, file_path=file_path, file_size=result_array.size*result_array.itemsize)
+                    # Update op
+                    ravdb.update_op(
+                        op, outputs=json.dumps([data_obj.id]), status=OpStatus.COMPUTED
+                    )
+            
+            else:
+
+                op_id = data["op_id"]
+
+                op = ravdb.get_op(op_id)
+
+                if data["status"] == "success":
+                    data_obj = ravdb.create_data(dtype="ndarray")
+                    # file_path = dump_data(data_obj.id, value=np.array(data["result"]))
+                    temp_file_name = str(data["file_name"])
+
+                    username = str(data['username'])
+
+                    file_path_dir = FTP_RAVOP_FILES_PATH + '/' + str(username) + '/'
+
+                    temp_file_path = file_path_dir + temp_file_name
+
+                    new_file_path = file_path_dir + 'data_' + str(data_obj.id) + '.npy' 
+
+                    os.rename(temp_file_path, new_file_path)
+
+                    ravdb.update_data(data_obj, file_path=new_file_path)
+
+                    # Update op
+                    ravdb.update_op(
+                        op, outputs=json.dumps([data_obj.id]), status=OpStatus.COMPUTED
+                    )
+
+                # subgraph_id = op.subgraph_id
+        
+        client = ravdb.get_client_by_cid(client_cid)
+        subgraph_id = client.current_subgraph_id
+        graph_id = client.current_graph_id
+
+        subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
+        ravdb.update_subgraph(subgraph, status="computed")
+        
+        ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
+
+        # Emit another op to this client
+        await emit_op(client.sid)
+
+        return web.json_response(
+            {"message": "Subgraph completed successfully"},
+            text=None,
+            body=None,
+            status=200,
+            reason=None,
+            headers=None,
+            content_type="application/json",
+            dumps=json.dumps
+        )
+
+    except Exception as e:
+
+        print("\nSUBGRAPH COMPLETED ENDPOINT ERROR : ", str(e))
+
+        return web.json_response(
+            {"message": "Unable to complete SubGraph"}, content_type="text/html", status=400
+        )

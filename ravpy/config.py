@@ -24,3 +24,5 @@ ENCRYPTION = False
 FTP_TEMP_FILES_FOLDER = os.path.join(os.getcwd(),"ravpy/distributed/temp_files")
 
 FTP_DOWNLOAD_FILES_FOLDER = os.path.join(os.getcwd(),"ravpy/distributed/downloads")
+
+RAVSOCK_SERVER_URL = os.environ.get("RAVSOCK_SERVER_URL", "http://0.0.0.0:9999/")

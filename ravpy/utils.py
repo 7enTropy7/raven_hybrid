@@ -9,7 +9,7 @@ from .config import ENCRYPTION
 if ENCRYPTION:
     import tenseal as ts
 
-from .config import BASE_DIR, CONTEXT_FOLDER, SOCKET_SERVER_URL, FTP_TEMP_FILES_FOLDER
+from .config import BASE_DIR, CONTEXT_FOLDER, SOCKET_SERVER_URL, FTP_TEMP_FILES_FOLDER, RAVSOCK_SERVER_URL
 
 from threading import Timer  
 
@@ -172,3 +172,13 @@ def load_data(path):
     Load ndarray from file
     """
     return np.load(path, allow_pickle=True)
+
+def make_request(endpoint, method, payload={}, headers=None):
+    if method == "post":
+        return requests.post(
+            "{}{}".format(RAVSOCK_SERVER_URL, endpoint), json=payload, headers=headers
+        )
+    elif method == "get":
+        return requests.get(
+            "{}{}".format(RAVSOCK_SERVER_URL, endpoint), headers=headers
+        )
