@@ -506,7 +506,7 @@ class Data(ParentClass):
                 value = convert_to_ndarray(value)
 
                 byte_size = value.size * value.itemsize
-                if byte_size > 10 * 1000000:
+                if byte_size > 20 * 1000000:
                     dtype = value.dtype
                     kwargs['dtype'] = str(dtype)
                     kwargs['username'] = ftp_username
@@ -523,7 +523,7 @@ class Data(ParentClass):
         # print("Check ftp creds: ",check_credentials(ftp_username,ftp_password))
 
         if id is None:
-            if value is not None and byte_size > 10 * 1000000:
+            if value is not None and byte_size > 20 * 1000000:
                 #value = convert_to_ndarray(value)
                 file_path = dump_data(self.id, value)
                 ftp_client.upload(file_path, os.path.basename(file_path))

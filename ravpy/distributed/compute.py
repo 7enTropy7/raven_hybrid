@@ -189,7 +189,7 @@ def compute_locally(payload):
         
         result_byte_size = result.size * result.itemsize
 
-        if result_byte_size < (10 * 1000000)//50:
+        if result_byte_size < (20 * 1000000):
             try:
                 result = result.tolist()
             except:
@@ -232,6 +232,7 @@ def compute_locally(payload):
 
 
 def upload_result(payload, result):
+    result_size = result.size * result.itemsize
     try:
         result = result.tolist()
     except:
@@ -242,7 +243,7 @@ def upload_result(payload, result):
     file_path = dump_data(payload['op_id'],result)
     g.ftp_client.upload(file_path, os.path.basename(file_path))
     
-    print("\nFile uploaded!", file_path)
+    print("\nFile uploaded!", file_path, ' Size: ', result_size)
     os.remove(file_path)
   
     return file_path

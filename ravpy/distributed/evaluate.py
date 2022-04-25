@@ -4,7 +4,7 @@ import os
 from ravop import functions
 from .compute import compute_locally, emit_error
 
-from ..utils import setTimeout, stopTimer, make_request
+from ..utils import setTimeout, stopTimer
 
 from ..globals import g
 
@@ -47,12 +47,8 @@ def compute_subgraph(d):
         # stopTimer(timeoutId)
         # timeoutId = setTimeout(waitInterval,opTimeout)  
 
-    # client.emit("subgraph_completed", json.dumps(results), namespace="/client")
-    post_endpoint = f"subgraph/completed/?cid={g.cid}"
-    res = make_request(post_endpoint,"post",payload=json.dumps(results))
-    # time.sleep(3)
-    print('Request to subgraph/completed posted, res = ', res.json())
-    # print('Emitted subgraph_completed')
+    client.emit("subgraph_completed", json.dumps(results), namespace="/client")
+    print('Emitted subgraph_completed')
 
     g.has_subgraph = False
     

@@ -13,8 +13,8 @@ os.makedirs(BASE_DIR, exist_ok=True)
 os.makedirs(DATA_FILES_PATH, exist_ok=True)
 os.makedirs(TEMP_FILES_PATH, exist_ok=True)
 
-RAVSOCK_SERVER_URL = os.environ.get("RAVSOCK_SERVER_URL", "http://0.0.0.0:9999/")
+RAVSOCK_SERVER_URL = os.environ.get("RAVSOCK_SERVER_URL", "http://35.232.84.220:9999/")
 
 LOCAL_COMPUTE = False
 
-FTP_SERVER_URL = "localhost"
+FTP_SERVER_URL = "35.232.84.220"

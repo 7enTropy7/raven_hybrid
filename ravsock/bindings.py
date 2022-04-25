@@ -114,6 +114,3 @@ app.router.add_get("/client/ftp_credentials/", get_ftp_credentials)
 
 # Ravop create developer endpoint
 app.router.add_get("/ravop/developer/add/", add_developer)
-
-#Subgraph completed
-app.router.add_post("/subgraph/completed/", subgraph_completed_request)

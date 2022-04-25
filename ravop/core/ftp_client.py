@@ -16,7 +16,6 @@ class FTPClient:
         print("Downloaded")
 
     def upload(self, filename, path):
-        self.ftp.voidcmd('NOOP')
         self.ftp.storbinary('STOR ' + path, open(filename, 'rb'), blocksize=1024*1000)
 
     def list_server_files(self):
