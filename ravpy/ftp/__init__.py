@@ -3,6 +3,7 @@ from ftplib import FTP
 from requests import delete
 
 from ..config import FTP_SERVER_URL
+from ..globals import g
 
 
 class FTPClient:
@@ -14,11 +15,11 @@ class FTPClient:
 
     def download(self, filename, path):
         print('Downloading')
-        self.ftp.retrbinary('RETR ' + path, open(filename, 'wb').write, blocksize=1024*1000)
+        self.ftp.retrbinary('RETR ' + path, open(filename, 'wb').write, blocksize=g.ftp_download_blocksize)
         print("Downloaded")
 
     def upload(self, filename, path):
-        self.ftp.storbinary('STOR ' + path, open(filename, 'rb'), blocksize=1024*1000)
+        self.ftp.storbinary('STOR ' + path, open(filename, 'rb'), blocksize=g.ftp_upload_blocksize)
 
     def list_server_files(self):
         self.ftp.retrlines('LIST')

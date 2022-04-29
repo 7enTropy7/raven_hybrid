@@ -29,11 +29,11 @@ numpy_functions = {
             "square_root":"np.sqrt",
             "cube_root":"np.cbrt",
             "abs":"np.abs",
-            "sum":"np.sum",
+            "sum":"sum",
             "sort":"np.sort",
             "reverse":"np.flip",
             "min":"np.min",
-            "max":"np.max",
+            "max":"max",
             "argmax":"np.argmax",
             "argmin":"np.argmin",
             "transpose":"np.transpose",
@@ -81,7 +81,11 @@ numpy_functions = {
             #'sign': Operators.SIGN,  
             'foreach': 'foreach',
             'set_value': 'set_value',
-
+            'clip': 'clip',
+            'random_uniform': 'np.random.uniform',
+            'prod': 'np.prod',
+            'flatten': 'flatten',
+            'ravel': 'np.ravel',
 
             'concat': 'concatenate',
             'cube': 'np.cbrt'
@@ -187,9 +191,12 @@ def compute_locally(payload):
 
             result = eval(expression)
         
+        if not isinstance(result, np.ndarray):
+            result = np.array(result)
+
         result_byte_size = result.size * result.itemsize
 
-        if result_byte_size < (20 * 1000000):
+        if result_byte_size < (30 * 1000000)//10000:
             try:
                 result = result.tolist()
             except:
@@ -305,9 +312,38 @@ def where(a,b,condition=None):
     if condition is None:
         raise Exception("condition is missing")
     else:
-        result=np.where(a,condition,b)
+        result=np.where(condition,a,b)
     return result
- 
+
+def clip(a,lower_limit=None,upper_limit=None):
+    if lower_limit is None:
+        raise Exception("lower limit is missing")
+    elif upper_limit is None:
+        raise Exception("upper limit is missing")
+    else:
+        result = np.clip(a,lower_limit,upper_limit)
+    return result
+
+def max(a,axis=None,keepdims=False):
+    if str(keepdims) == 'True':
+        keepdims = True
+    else:
+        keepdims = False
+    result=np.max(a,axis=axis,keepdims=keepdims)
+    return result
+
+def sum(a,axis=None,keepdims=False):
+    if str(keepdims) == 'True':
+        keepdims = True
+    else:
+        keepdims = False
+    result=np.sum(a,axis=axis,keepdims=keepdims)
+    return result
+
+def flatten(a):
+    a = np.array(a)
+    return a.flatten()
+
 def split(arr,numOrSizeSplits=None,axis=None):
     result=np.split(arr,numOrSizeSplits,axis=axis)
     return result
