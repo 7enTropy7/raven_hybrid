@@ -888,9 +888,15 @@ class DBManager(object):
 
     def get_ready_subgraphs_from_graph(self, graph_id):
         """
-        Get an existing ready subgraph
+        Get existing ready subgraphs
         """
         return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).filter(SubGraph.status == 'ready').all()
+
+    def get_not_ready_subgraphs_from_graph(self, graph_id):
+        """
+        Get existing not ready subgraphs
+        """
+        return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).filter(SubGraph.status == 'not_ready').all()    
 
     def get_subgraphs_from_graph(self, graph_id):
         """

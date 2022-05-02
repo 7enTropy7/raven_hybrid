@@ -64,7 +64,7 @@ async def vertical_split(graph_id):
             subgraph_op_ids.append(subgraph_op.id)
         subgraph_op_ids.sort()
         
-        if subgraph is None:
+        if subgraph is None: 
             subgraph = ravdb.create_subgraph(subgraph_id=subgraph_id, graph_id=graph_id,
                                             op_ids=str(subgraph_op_ids), status=SubgraphStatus.READY)
         else:
@@ -502,17 +502,29 @@ async def run_scheduler():
                 current_graph_id = distributed_graph.id
 
                 ravdb.update_graph(distributed_graph, inactivity = distributed_graph.inactivity + 1)
+                ready_subgraphs = ravdb.get_ready_subgraphs_from_graph(graph_id=current_graph_id)
 
-                if distributed_graph.inactivity >= 200:
+                if len(ready_subgraphs)>=1:
                     dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
                     if dead_subgraph is not None:
                         ravdb.update_subgraph(dead_subgraph, optimized="False")
-                        ravdb.update_graph(distributed_graph, inactivity = 0)
 
+                # if distributed_graph.inactivity >= 200:
+                #     dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
+                #     if dead_subgraph is not None:
+                #         ravdb.update_subgraph(dead_subgraph, optimized="False")
+                #         ravdb.update_graph(distributed_graph, inactivity = 0)
+
+                # ready_subgraphs = ravdb.get_ready_subgraphs_from_graph(graph_id=current_graph_id)
+                # not_ready_subgraphs = ravdb.get_not_ready_subgraphs_from_graph(graph_id=current_graph_id)
+
+                # if len(ready_subgraphs) == 0 or len(not_ready_subgraphs)>=0:
                 await vertical_split(distributed_graph.id)
                 await sio.sleep(0.1)
+
                 await horizontal_split(distributed_graph.id)
                 await sio.sleep(0.1)
+
                 await retry_failed_subgraphs(distributed_graph.id)
                 await sio.sleep(0.1)
                 
