@@ -48,7 +48,7 @@ def create_sub_graphs(graph_id):
 async def vertical_split(graph_id):
     op_dependency = ravdb.get_graph_op_dependency(graph_id)
 
-    # print('OP DEPENDENCY: ',op_dependency)
+    print('\nOP DEPENDENCY: ',op_dependency)
 
     for subgraph_id in op_dependency:
         op_ids = op_dependency[subgraph_id]
@@ -65,8 +65,10 @@ async def vertical_split(graph_id):
         subgraph_op_ids.sort()
         
         if subgraph is None: 
-            subgraph = ravdb.create_subgraph(subgraph_id=subgraph_id, graph_id=graph_id,
-                                            op_ids=str(subgraph_op_ids), status=SubgraphStatus.READY)
+            ready_subgraph = ravdb.get_first_active_subgraph_from_graph(graph_id=graph_id)
+            if ready_subgraph is None:
+                subgraph = ravdb.create_subgraph(subgraph_id=subgraph_id, graph_id=graph_id,
+                                                op_ids=str(subgraph_op_ids), status=SubgraphStatus.READY, complexity=1)
         else:
             if subgraph.status != 'failed':
                 if subgraph.status == 'standby':
@@ -142,16 +144,17 @@ async def vertical_split(graph_id):
                 subsubgraphs = [list(x) for x in subsubgraphs]
 
                 if len(subsubgraphs) > 1:
-                        new_op_dependency[subgraph_id] = subsubgraphs[0]
-                        for i in range(1,len(subsubgraphs)):
-                            new_op_dependency[last_id + i] = subsubgraphs[i]
+                    new_op_dependency[subgraph_id] = subsubgraphs[0]
+                    for i in range(1,len(subsubgraphs)):
+                        new_op_dependency[last_id + i] = subsubgraphs[i]
                 elif len(subsubgraphs) == 1:
                     new_op_dependency[subgraph_id] = subsubgraphs[0]
 
                 if len(new_op_dependency) != 0:
                     last_id = list(new_op_dependency.keys())[-1]
+            break
 
-    # print('\nNEW OP DEPENDENCY: ',new_op_dependency)    
+    print('\nNEW OP DEPENDENCY: ',new_op_dependency)    
     for subgraph_id in new_op_dependency:
         op_ids = new_op_dependency[subgraph_id]
         for k in range(len(op_ids)):
@@ -166,15 +169,15 @@ async def vertical_split(graph_id):
 
         sorted_new_op_deps.sort()
         if subgraph is not None:
-            complexity = calculate_subgraph_complexity(subgraph=subgraph)
+            # complexity = calculate_subgraph_complexity(subgraph=subgraph)
             ravdb.update_subgraph(subgraph, subgraph_id=subgraph_id, graph_id=graph_id,
                                   op_ids=str(sorted_new_op_deps),
-                                  complexity=complexity, optimized="True", status=SubgraphStatus.READY)
-        else:
+                                  optimized="True", status=SubgraphStatus.READY)
+        else:   
             subgraph = ravdb.create_subgraph(subgraph_id=subgraph_id, graph_id=graph_id,
-                                             op_ids=str(sorted_new_op_deps), status=SubgraphStatus.READY, optimized="True")
-            complexity = calculate_subgraph_complexity(subgraph=subgraph)
-            ravdb.update_subgraph(subgraph, complexity=complexity)
+                                             op_ids=str(sorted_new_op_deps), status=SubgraphStatus.READY, optimized="True", complexity=2)
+            # complexity = calculate_subgraph_complexity(subgraph=subgraph)
+            # ravdb.update_subgraph(subgraph, complexity=2)
 
 
 
@@ -198,7 +201,7 @@ async def horizontal_split(graph_id, minimum_split_size=50):
                 last_subgraph_id = len(ravdb.get_all_subgraphs(graph_id=graph_id))
                 if len(row2) > 0:
                     new_subgraph = ravdb.create_subgraph(subgraph_id=last_subgraph_id + 1, graph_id=graph_id,
-                                        optimized="False", op_ids=str(row2), status="standby", parent_subgraph_id=subgraph.subgraph_id)
+                                        optimized="False", op_ids=str(row2), status="standby", parent_subgraph_id=subgraph.subgraph_id, complexity=3)
                     for op_id in row2:
                         op = ravdb.get_op(op_id)
                         ravdb.update_op(op, subgraph_id=new_subgraph.subgraph_id)
@@ -511,7 +514,7 @@ async def run_scheduler():
                 #     if dead_subgraph is not None:
                 #         ravdb.update_subgraph(dead_subgraph, optimized="False")
 
-                if distributed_graph.inactivity >= 200:
+                if distributed_graph.inactivity >= 100:
                     dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
                     # dead_subgraph = ready_subgraphs[0]
                     if dead_subgraph is not None:

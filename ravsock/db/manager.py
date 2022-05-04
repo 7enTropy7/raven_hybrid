@@ -886,6 +886,12 @@ class DBManager(object):
         """
         return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).filter(SubGraph.status == 'ready').first()
 
+    def get_first_active_subgraph_from_graph(self, graph_id):
+        """
+        Get an existing subgraph
+        """
+        return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).filter(or_(SubGraph.status == 'ready',SubGraph.status == 'not_ready',SubGraph.status == 'standby')).first()
+
     def get_ready_subgraphs_from_graph(self, graph_id):
         """
         Get existing ready subgraphs
