@@ -48,7 +48,7 @@ def create_sub_graphs(graph_id):
 async def vertical_split(graph_id):
     op_dependency = ravdb.get_graph_op_dependency(graph_id)
 
-    print('\nOP DEPENDENCY: ',op_dependency)
+    # print('\nOP DEPENDENCY: ',op_dependency)
 
     for subgraph_id in op_dependency:
         op_ids = op_dependency[subgraph_id]
@@ -154,7 +154,7 @@ async def vertical_split(graph_id):
                     last_id = list(new_op_dependency.keys())[-1]
             break
 
-    print('\nNEW OP DEPENDENCY: ',new_op_dependency)    
+    # print('\nNEW OP DEPENDENCY: ',new_op_dependency)    
     for subgraph_id in new_op_dependency:
         op_ids = new_op_dependency[subgraph_id]
         for k in range(len(op_ids)):
