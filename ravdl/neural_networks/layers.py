@@ -2,7 +2,6 @@ from __future__ import print_function, division
 import math
 import numpy as np
 import copy
-from ..globals import globals as g
 from .activation_functions import Sigmoid, Softmax, TanH, ReLU
 import ravop as R
 
@@ -19,7 +18,7 @@ class Layer(object):
 
     def parameters(self):
         """ The number of trainable parameters used by the layer """
-        return g.zero
+        return R.t(0)
 
     def forward_pass(self, X, training):
         """ Propogates the signal forward in the network """
@@ -57,7 +56,7 @@ class Dense(Layer):
 
     def initialize(self, optimizer):
         # Initialize the weights
-        limit = R.div(g.one, R.square_root(R.t(int(self.input_shape[0]))))
+        limit = R.div(R.t(1), R.square_root(R.t(int(self.input_shape[0]))))
         self.W = R.random_uniform(R.neg(limit), limit, size=(int(self.input_shape[0]), self.n_units))
         self.w0 = R.t(np.zeros((1,self.n_units)))
         # Weight optimizers
@@ -124,15 +123,15 @@ class BatchNormalization(Layer):
         if training and self.trainable:
             mean = R.mean(X, axis=0)
             var = R.variance(X, axis=0)
-            self.running_mean = self.momentum * self.running_mean + (g.one - self.momentum) * mean
-            self.running_var = self.momentum * self.running_var + (g.one - self.momentum) * var
+            self.running_mean = self.momentum * self.running_mean + (R.t(1) - self.momentum) * mean
+            self.running_var = self.momentum * self.running_var + (R.t(1) - self.momentum) * var
         else:
             mean = self.running_mean
             var = self.running_var
 
         # Statistics saved for backward pass
         self.X_centered = X - mean
-        self.stddev_inv = R.div(g.one, R.square_root(var + self.eps))
+        self.stddev_inv = R.div(R.t(1), R.square_root(var + self.eps))
 
         X_norm = self.X_centered * self.stddev_inv
         output = self.gamma * X_norm + self.beta
@@ -157,7 +156,7 @@ class BatchNormalization(Layer):
 
         # The gradient of the loss with respect to the layer inputs (use weights and statistics from forward pass)
         
-        accum_grad = R.div(g.one,batch_size) * gamma * self.stddev_inv * (batch_size * accum_grad - R.sum(accum_grad, axis=0) 
+        accum_grad = R.div(R.t(1),batch_size) * gamma * self.stddev_inv * (batch_size * accum_grad - R.sum(accum_grad, axis=0) 
                                                                             - self.X_centered * R.square(self.stddev_inv) * R.sum(accum_grad * self.X_centered, axis=0))
         
         return accum_grad
@@ -184,9 +183,9 @@ class Dropout(Layer):
         self.trainable = True
 
     def forward_pass(self, X, training=True):
-        c = g.one - R.t(self.p)
+        c = R.t(1) - R.t(self.p)
         if training:
-            self._mask = R.greater(R.random_uniform(g.zero,g.one,size=X().shape), R.t(self.p))
+            self._mask = R.greater(R.random_uniform(R.t(0),R.t(1),size=X().shape), R.t(self.p))
             c = self._mask
         return X * c
 
@@ -247,7 +246,7 @@ class Conv2D(Layer):
         # Initialize the weights
         filter_height, filter_width = self.filter_shape
         channels = self.input_shape[0]
-        limit = R.div(g.one, R.square_root(R.prod(R.t(self.filter_shape))))
+        limit = R.div(R.t(1), R.square_root(R.prod(R.t(self.filter_shape))))
 
         self.W = R.random_uniform(R.neg(limit), limit, size=(self.n_filters, channels, filter_height, filter_width))
         self.w0 = R.t(np.zeros((self.n_filters, 1)))
