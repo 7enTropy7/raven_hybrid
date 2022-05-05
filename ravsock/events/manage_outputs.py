@@ -29,10 +29,10 @@ async def get_op(sid, message):
     # Find, create payload and emit op
     await emit_op(sid)
 
-async def subgraph_completed(sid, results_list):
+async def subgraph_completed(sid, results_dict):
     # Save the results
-
-    results_list = json.loads(results_list)
+    results_dict = json.loads(results_dict)
+    results_list = results_dict["results"]#json.loads(results_list)
     
     # subgraph_id = None
     
@@ -85,10 +85,15 @@ async def subgraph_completed(sid, results_list):
             # subgraph_id = op.subgraph_id
     
     client = ravdb.get_client_by_sid(sid)
-    subgraph_id = client.current_subgraph_id
+    subgraph_id = client.current_subgraph_id 
     graph_id = client.current_graph_id
-
+    
     subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
+    if subgraph is None:
+        subgraph_id = results_dict["subgraph_id"]
+        graph_id = results_dict["graph_id"]
+        subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
+
     ravdb.update_subgraph(subgraph, status="computed")
     
     ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())

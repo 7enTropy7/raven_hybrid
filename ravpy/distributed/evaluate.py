@@ -16,10 +16,10 @@ client = g.client
 @g.client.on('subgraph', namespace="/client")
 def compute_subgraph(d):
     global client, timeoutId
-    print("Subgraph Received...")
+    print("Received Subgraph : ",d["subgraph_id"]," of Graph : ",d["graph_id"])
     g.has_subgraph = True
 
-    data = d
+    data = d["payloads"]
     results = []
     
     for index in data:
@@ -46,8 +46,8 @@ def compute_subgraph(d):
 
         # stopTimer(timeoutId)
         # timeoutId = setTimeout(waitInterval,opTimeout)  
-
-    client.emit("subgraph_completed", json.dumps(results), namespace="/client")
+    emit_result_data = {"subgraph_id": d["subgraph_id"],"graph_id":d["graph_id"],"results":results}
+    client.emit("subgraph_completed", json.dumps(emit_result_data), namespace="/client")
     print('Emitted subgraph_completed')
 
     g.has_subgraph = False
