@@ -76,5 +76,5 @@ def benchmark():
     print("\nEmitting Benchmark Results...")
     client.emit("benchmark_callback", data=json.dumps(benchmark_results), namespace="/client")
     client.sleep(1)
-    setTimeout(waitInterval, initialTimeout)
+    # setTimeout(waitInterval, initialTimeout)
     return benchmark_results

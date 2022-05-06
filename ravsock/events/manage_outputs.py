@@ -35,8 +35,8 @@ async def subgraph_completed(sid, results_dict):
     results_list = results_dict["results"]#json.loads(results_list)
     
     # subgraph_id = None
-    
-    # print('RESULTS_LIST: \n\n\n\n\n',results_list)
+    print("Received subgraph completed for subgraph id: ", results_dict["subgraph_id"])
+    print('RESULTS_LIST: \n\n\n\n\n',results_list)
     for data in results_list:
         data = json.loads(data)
         print("\nResult received: op_type: {}, operator: {}, op_id: {}, status: {}".format(data['op_type'],data['operator'],data['op_id'],data['status']))
