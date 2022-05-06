@@ -59,8 +59,8 @@ def compute_subgraph(d):
 
     g.has_subgraph = False
     
-    # stopTimer(timeoutId)
-    # timeoutId = setTimeout(waitInterval,opTimeout)
+    stopTimer(timeoutId)
+    timeoutId = setTimeout(waitInterval,opTimeout)
 
 
     for ftp_file in g.delete_files_list:

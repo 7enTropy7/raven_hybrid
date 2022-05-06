@@ -630,7 +630,7 @@ async def run_scheduler():
                             ravdb.update_subgraph(subgraph, status='assigned')
                             ravdb.update_client(client, reporting='busy', current_subgraph_id=subgraph.subgraph_id,
                                                 current_graph_id=subgraph.graph_id)
-                            await emit_op(client.sid)
+                            # await emit_op(client.sid)
 
                         else:
                             print('\n\nNo idle clients')
