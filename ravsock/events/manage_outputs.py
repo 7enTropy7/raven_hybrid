@@ -99,7 +99,7 @@ async def subgraph_completed(sid, results_dict):
     ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
 
     # Emit another op to this client
-    await emit_op(sid)
+    # await emit_op(sid)
 
 
 
@@ -125,7 +125,7 @@ async def op_completed(sid, data):
             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
 
     # Emit another op to this client
-    await emit_op(sid)
+    # await emit_op(sid)
 
 
 def update_client_op_mapping(op_id, sid, status):
