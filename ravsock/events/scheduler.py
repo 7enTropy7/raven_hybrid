@@ -307,20 +307,26 @@ async def emit_op(sid, op=None):
 
                     # if subgraph.has_failed == "True":
                     #     print('Sending Payload: ', payloads)
-                    logger.debug("Emitting Subgraph:{}, {}".format(sid, payloads))
-                    emit_data = {"subgraph_id":subgraph_id,"graph_id":graph_id,"payloads":payloads}
-                    await sio.emit("subgraph", emit_data, namespace="/client", room=sid)
-                    print("\n Emitted subgraph: ", subgraph_id)
-                    
-                    ravdb.update_graph(ravdb.get_graph(graph_id), inactivity=0)
+                    if len(payloads) > 0:
+                        logger.debug("Emitting Subgraph:{}, {}".format(sid, payloads))
+                        emit_data = {"subgraph_id":subgraph_id,"graph_id":graph_id,"payloads":payloads}
+                        await sio.emit("subgraph", emit_data, namespace="/client", room=sid)
+                        print("\n Emitted subgraph: ", subgraph_id)
+                        
+                        ravdb.update_graph(ravdb.get_graph(graph_id), inactivity=0)
 
-                    ravdb.update_subgraph(subgraph, status=SubgraphStatus.COMPUTING, retry_attempts = subgraph.retry_attempts + 1)
+                        ravdb.update_subgraph(subgraph, status=SubgraphStatus.COMPUTING, retry_attempts = subgraph.retry_attempts + 1)
 
-                    for op_id in appended_ops:
-                        ravop = ravdb.get_op(op_id)
-                        if ravop is not None:
-                            if ravop.status == "pending":
-                                ravdb.update_op(ravop, status=OpStatus.COMPUTING)
+                        for op_id in appended_ops:
+                            ravop = ravdb.get_op(op_id)
+                            if ravop is not None:
+                                if ravop.status == "pending":
+                                    ravdb.update_op(ravop, status=OpStatus.COMPUTING)
+                    else:
+                        ravdb.update_subgraph(subgraph, status="computed")
+                        assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
+                        if assigned_client is not None:
+                            ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
 
                 else:
                     print("\n\nSubgraph not ready")
