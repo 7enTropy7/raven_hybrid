@@ -118,7 +118,7 @@ async def vertical_split(graph_id):
     new_op_dependency = {}
     for subgraph_id in op_dependency:
         subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
-        if subgraph is not None and subgraph.status != 'standby' and subgraph.status != 'computed' and subgraph.status != 'computing':
+        if subgraph is not None and subgraph.status != 'standby' and subgraph.status != 'computed' and subgraph.status != 'computing' and subgraph.status != "assigned":
             if subgraph.optimized == "False":
                 computed_ops = []
                 G = nx.DiGraph()
@@ -525,12 +525,12 @@ async def run_scheduler():
                     if dead_subgraph is not None:
                         ravdb.update_subgraph(dead_subgraph, optimized="False")
 
-                # if distributed_graph.inactivity >= 100:
-                #     dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
-                #     # dead_subgraph = ready_subgraphs[0]
-                #     if dead_subgraph is not None:
-                #         ravdb.update_subgraph(dead_subgraph, optimized="False")
-                #         ravdb.update_graph(distributed_graph, inactivity = 0)
+                if distributed_graph.inactivity >= 100:
+                    dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
+                    # dead_subgraph = ready_subgraphs[0]
+                    if dead_subgraph is not None:
+                        ravdb.update_subgraph(dead_subgraph, optimized="False")
+                        ravdb.update_graph(distributed_graph, inactivity = 0)
 
                 # ready_subgraphs = ravdb.get_ready_subgraphs_from_graph(graph_id=current_graph_id)
                 # not_ready_subgraphs = ravdb.get_not_ready_subgraphs_from_graph(graph_id=current_graph_id)
