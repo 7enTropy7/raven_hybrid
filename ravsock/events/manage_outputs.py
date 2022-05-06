@@ -35,8 +35,8 @@ async def subgraph_completed(sid, results_dict):
     results_list = results_dict["results"]#json.loads(results_list)
     
     # subgraph_id = None
-    print("Received subgraph completed for subgraph id: ", results_dict["subgraph_id"])
-    print('RESULTS_LIST: \n\n\n\n\n',results_list)
+    
+    # print('RESULTS_LIST: \n\n\n\n\n',results_list)
     for data in results_list:
         data = json.loads(data)
         print("\nResult received: op_type: {}, operator: {}, op_id: {}, status: {}".format(data['op_type'],data['operator'],data['op_id'],data['status']))
@@ -99,7 +99,7 @@ async def subgraph_completed(sid, results_dict):
     ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
 
     # Emit another op to this client
-    # await emit_op(sid)
+    await emit_op(sid)
 
 
 
@@ -125,7 +125,7 @@ async def op_completed(sid, data):
             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
 
     # Emit another op to this client
-    # await emit_op(sid)
+    await emit_op(sid)
 
 
 def update_client_op_mapping(op_id, sid, status):

@@ -118,7 +118,7 @@ async def vertical_split(graph_id):
     new_op_dependency = {}
     for subgraph_id in op_dependency:
         subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
-        if subgraph is not None and subgraph.status != 'standby' and subgraph.status != 'computed' and subgraph.status != 'computing':#assigned
+        if subgraph is not None and subgraph.status != 'standby' and subgraph.status != 'computed' and subgraph.status != 'computing' and subgraph.status != "assigned":
             if subgraph.optimized == "False":
                 computed_ops = []
                 G = nx.DiGraph()
@@ -307,27 +307,20 @@ async def emit_op(sid, op=None):
 
                     # if subgraph.has_failed == "True":
                     #     print('Sending Payload: ', payloads)
-                    if len(payloads)>0:
-                        logger.debug("Emitting Subgraph:{}, {}".format(sid, payloads))
-                        emit_data = {"subgraph_id":subgraph_id,"graph_id":graph_id,"payloads":payloads}
-                        await sio.emit("subgraph", emit_data, namespace="/client", room=sid)
-                        print("\n Emitted subgraph: ", subgraph_id)
-                        
-                        ravdb.update_graph(ravdb.get_graph(graph_id), inactivity=0)
+                    logger.debug("Emitting Subgraph:{}, {}".format(sid, payloads))
+                    emit_data = {"subgraph_id":subgraph_id,"graph_id":graph_id,"payloads":payloads}
+                    await sio.emit("subgraph", emit_data, namespace="/client", room=sid)
+                    print("\n Emitted subgraph: ", subgraph_id)
+                    
+                    ravdb.update_graph(ravdb.get_graph(graph_id), inactivity=0)
 
-                        ravdb.update_subgraph(subgraph, status=SubgraphStatus.COMPUTING, retry_attempts = subgraph.retry_attempts + 1)
+                    ravdb.update_subgraph(subgraph, status=SubgraphStatus.COMPUTING, retry_attempts = subgraph.retry_attempts + 1)
 
-                        for op_id in appended_ops:
-                            ravop = ravdb.get_op(op_id)
-                            if ravop is not None:
-                                if ravop.status == "pending":
-                                    ravdb.update_op(ravop, status=OpStatus.COMPUTING)
-                    else:
-                        ravdb.update_subgraph(subgraph, status="computed")
-                        assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
-                        if assigned_client is not None:
-                            ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
-
+                    for op_id in appended_ops:
+                        ravop = ravdb.get_op(op_id)
+                        if ravop is not None:
+                            if ravop.status == "pending":
+                                ravdb.update_op(ravop, status=OpStatus.COMPUTING)
 
                 else:
                     print("\n\nSubgraph not ready")
@@ -526,18 +519,18 @@ async def run_scheduler():
                 
                 ready_subgraphs = ravdb.get_ready_subgraphs_from_graph(graph_id=current_graph_id)
 
-                if len(ready_subgraphs)>=1:#only>1
+                if len(ready_subgraphs)>=1:
                     dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
                     # dead_subgraph = ready_subgraphs[0]
                     if dead_subgraph is not None:
                         ravdb.update_subgraph(dead_subgraph, optimized="False")
 
-                # if distributed_graph.inactivity >= 100:
-                #     dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
-                #     # dead_subgraph = ready_subgraphs[0]
-                #     if dead_subgraph is not None:
-                #         ravdb.update_subgraph(dead_subgraph, optimized="False")
-                #         ravdb.update_graph(distributed_graph, inactivity = 0)
+                if distributed_graph.inactivity >= 100:
+                    dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
+                    # dead_subgraph = ready_subgraphs[0]
+                    if dead_subgraph is not None:
+                        ravdb.update_subgraph(dead_subgraph, optimized="False")
+                        ravdb.update_graph(distributed_graph, inactivity = 0)
 
                 # ready_subgraphs = ravdb.get_ready_subgraphs_from_graph(graph_id=current_graph_id)
                 # not_ready_subgraphs = ravdb.get_not_ready_subgraphs_from_graph(graph_id=current_graph_id)
@@ -630,7 +623,6 @@ async def run_scheduler():
                             ravdb.update_subgraph(subgraph, status='assigned')
                             ravdb.update_client(client, reporting='busy', current_subgraph_id=subgraph.subgraph_id,
                                                 current_graph_id=subgraph.graph_id)
-                            # await emit_op(client.sid)
 
                         else:
                             print('\n\nNo idle clients')
