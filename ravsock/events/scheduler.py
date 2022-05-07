@@ -524,11 +524,11 @@ async def run_scheduler():
                 
                 ready_subgraphs = ravdb.get_ready_subgraphs_from_graph(graph_id=current_graph_id)
 
-                # if len(ready_subgraphs)>=1:
-                #     dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
-                #     # dead_subgraph = ready_subgraphs[0]
-                #     if dead_subgraph is not None:
-                #         ravdb.update_subgraph(dead_subgraph, optimized="False")
+                if len(ready_subgraphs)>=1:
+                    dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
+                    # dead_subgraph = ready_subgraphs[0]
+                    if dead_subgraph is not None:
+                        ravdb.update_subgraph(dead_subgraph, optimized="False")
 
                 if distributed_graph.inactivity >= 100:
                     dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
