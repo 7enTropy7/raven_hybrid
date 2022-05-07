@@ -94,7 +94,7 @@ async def subgraph_completed(sid, results_dict):
         graph_id = results_dict["graph_id"]
         subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
 
-    ravdb.update_subgraph(subgraph, status="computed")
+    ravdb.update_subgraph(subgraph, status="computed",complexity=20)
     
     ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
 
@@ -119,7 +119,7 @@ async def op_completed(sid, data):
             op, outputs=None, status=OpStatus.FAILED, message=data["error"]
         )
         subgraph = ravdb.get_subgraph(subgraph_id=op.subgraph_id, graph_id=op.graph_id)
-        ravdb.update_subgraph(subgraph, status="failed")
+        ravdb.update_subgraph(subgraph, status="failed",complexity=21)
         assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
         if assigned_client is not None:
             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
