@@ -90,7 +90,7 @@ async def vertical_split(graph_id):
                             if standby_flag:
                                 break
                     if not standby_flag or parent_subgraph.status == SubgraphStatus.COMPUTED:
-                        ravdb.update_subgraph(subgraph, op_ids=str(subgraph_op_ids), status='not_ready')
+                        ravdb.update_subgraph(subgraph, op_ids=str(subgraph_op_ids), status='not_ready',complexity=1)
 
                               
                 else:
@@ -99,7 +99,7 @@ async def vertical_split(graph_id):
                         assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
                         if assigned_client is not None:
                             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
-                        ravdb.update_subgraph(subgraph, status="not_ready", optimized="False",op_ids=str(subgraph_op_ids), retry_attempts=0,complexity=4)
+                        ravdb.update_subgraph(subgraph, status="not_ready", optimized="False",op_ids=str(subgraph_op_ids), retry_attempts=0,complexity=2)
                     
 
                     op_ids = subgraph.op_ids
@@ -110,7 +110,7 @@ async def vertical_split(graph_id):
                             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
                     else:
                         if subgraph.status != 'assigned' and subgraph.status != 'computing':
-                            ravdb.update_subgraph(subgraph, op_ids=str(subgraph_op_ids))
+                            ravdb.update_subgraph(subgraph, op_ids=str(subgraph_op_ids),complexity=3)
 
     last_id = len(ravdb.get_all_subgraphs(graph_id=graph_id))
     if last_id == 0:
@@ -183,7 +183,7 @@ async def vertical_split(graph_id):
             # complexity = calculate_subgraph_complexity(subgraph=subgraph)
             ravdb.update_subgraph(subgraph, subgraph_id=subgraph_id, graph_id=graph_id,
                                   op_ids=str(sorted_new_op_deps),
-                                  optimized="True", status=SubgraphStatus.READY)
+                                  optimized="True", status=SubgraphStatus.READY,complexity=4)
         else:   
             subgraph = ravdb.create_subgraph(subgraph_id=subgraph_id, graph_id=graph_id,
                                              op_ids=str(sorted_new_op_deps), status=SubgraphStatus.READY, optimized="True", complexity=2)
@@ -208,7 +208,7 @@ async def horizontal_split(graph_id, minimum_split_size=50):
                         row1 = op_ids[:minimum_split_size]
 
                 row2 = op_ids[minimum_split_size:]
-                ravdb.update_subgraph(subgraph, op_ids=str(row1))
+                ravdb.update_subgraph(subgraph, op_ids=str(row1),complexity=5)
                 last_subgraph_id = len(ravdb.get_all_subgraphs(graph_id=graph_id))
                 if len(row2) > 0:
                     new_subgraph = ravdb.create_subgraph(subgraph_id=last_subgraph_id + 1, graph_id=graph_id,
@@ -238,7 +238,7 @@ async def retry_failed_subgraphs(graph_id):
                     Queue.append(failed_combination)
 
             else:
-                ravdb.update_subgraph(failed_subgraph, status='failed')
+                ravdb.update_subgraph(failed_subgraph, status='failed',complexity=6)
                 ravdb.update_graph(graph, status="failed")
                 for op_id in op_ids:
                     failed_op = ravdb.get_op(op_id)
@@ -315,7 +315,7 @@ async def emit_op(sid, op=None):
                         
                         ravdb.update_graph(ravdb.get_graph(graph_id), inactivity=0)
 
-                        ravdb.update_subgraph(subgraph, status=SubgraphStatus.COMPUTING, retry_attempts = subgraph.retry_attempts + 1)
+                        ravdb.update_subgraph(subgraph, status=SubgraphStatus.COMPUTING, retry_attempts = subgraph.retry_attempts + 1,complexity=7)
 
                         for op_id in appended_ops:
                             ravop = ravdb.get_op(op_id)
@@ -323,7 +323,7 @@ async def emit_op(sid, op=None):
                                 if ravop.status == "pending":
                                     ravdb.update_op(ravop, status=OpStatus.COMPUTING)
                     else:
-                        ravdb.update_subgraph(subgraph, status="computed")
+                        ravdb.update_subgraph(subgraph, status="computed",complexity=8)
                         assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
                         if assigned_client is not None:
                             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
@@ -405,11 +405,11 @@ async def update_client_status():
     while True:
         clients = ravdb.get_clients(status='connected')
         for client in clients:
-            # if (datetime.datetime.utcnow() - client.last_active_time).seconds > 200: # To be reduced.
-            #     ravdb.update_client(client, status="disconnected", reporting='ready', disconnected_at=datetime.datetime.utcnow())
-            #     assigned_subgraph = ravdb.get_subgraph(client.current_subgraph_id, client.current_graph_id)
-            #     if assigned_subgraph is not None:
-            #         ravdb.update_subgraph(assigned_subgraph, status="ready")
+            if (datetime.datetime.utcnow() - client.last_active_time).seconds > 200: # To be reduced.
+                ravdb.update_client(client, status="disconnected", reporting='ready', disconnected_at=datetime.datetime.utcnow())
+                assigned_subgraph = ravdb.get_subgraph(client.current_subgraph_id, client.current_graph_id)
+                if assigned_subgraph is not None:
+                    ravdb.update_subgraph(assigned_subgraph, status="ready",complexity=666)
 
             client_type = "/{}".format(client.type)
             await sio.emit("check_status",
@@ -451,7 +451,7 @@ async def final_scheduler_call(graph_id):
             if bool(prelim_times):
                 fastest_client_id = min(prelim_times, key=prelim_times.get)
                 client = ravdb.get_client(id=fastest_client_id)
-                ravdb.update_subgraph(subgraph, status='assigned')
+                ravdb.update_subgraph(subgraph, status='assigned',complexity=9)
                 ravdb.update_client(client, reporting='busy', current_subgraph_id=subgraph.subgraph_id,
                                     current_graph_id=subgraph.graph_id)
 
@@ -480,12 +480,12 @@ async def final_scheduler_call(graph_id):
                 elif subgraph_op.status == "computing":
                     counter['computing'] += 1
             if counter['computed'] == num_ops:
-                ravdb.update_subgraph(subgraph, status="computed")
+                ravdb.update_subgraph(subgraph, status="computed",complexity=10)
                 assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
                 if assigned_client is not None:
                     ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
             elif counter['failed'] > 0:
-                ravdb.update_subgraph(subgraph, status="failed")
+                ravdb.update_subgraph(subgraph, status="failed",complexity=11)
                 assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
                 if assigned_client is not None:
                     ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
@@ -528,13 +528,13 @@ async def run_scheduler():
                     # dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
                     dead_subgraph = ready_subgraphs[0]
                     if dead_subgraph is not None:
-                        ravdb.update_subgraph(dead_subgraph, optimized="False")
+                        ravdb.update_subgraph(dead_subgraph, optimized="False",complexity=12)
 
                 if distributed_graph.inactivity >= 100:
                     dead_subgraph = ravdb.get_first_ready_subgraph_from_graph(graph_id=current_graph_id)
                     # dead_subgraph = ready_subgraphs[0]
                     if dead_subgraph is not None:
-                        ravdb.update_subgraph(dead_subgraph, optimized="False")
+                        ravdb.update_subgraph(dead_subgraph, optimized="False",complexity=13)
                         ravdb.update_graph(distributed_graph, inactivity = 0)
 
                 # ready_subgraphs = ravdb.get_ready_subgraphs_from_graph(graph_id=current_graph_id)
@@ -581,7 +581,7 @@ async def run_scheduler():
                                 elif failed_op.operator == "lin":
                                     ravdb.update_op(failed_op,subgraph_id=subgraph_id, message=None)
     
-                            updated_subgraph = ravdb.update_subgraph(subgraph, op_ids=str(failed_ops), status='ready', optimized='True', has_failed = "True")    
+                            updated_subgraph = ravdb.update_subgraph(subgraph, op_ids=str(failed_ops), status='ready', optimized='True', has_failed = "True",complexity=14)    
                 if len(Queue) > 0:
                     print('\nQUEUE', Queue)
 
@@ -625,7 +625,7 @@ async def run_scheduler():
                         if bool(prelim_times):
                             fastest_client_id = min(prelim_times, key=prelim_times.get)
                             client = ravdb.get_client(id=fastest_client_id)
-                            ravdb.update_subgraph(subgraph, status='assigned')
+                            ravdb.update_subgraph(subgraph, status='assigned',complexity=15)
                             ravdb.update_client(client, reporting='busy', current_subgraph_id=subgraph.subgraph_id,
                                                 current_graph_id=subgraph.graph_id)
 
@@ -659,7 +659,7 @@ async def run_scheduler():
 
                     if subgraph.status != 'computed':
                         if counter['computed'] == num_ops:
-                            ravdb.update_subgraph(subgraph, status="computed")
+                            ravdb.update_subgraph(subgraph, status="computed",complexity=16)
                             assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
                             if assigned_client is not None:
                                 ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
@@ -671,7 +671,7 @@ async def run_scheduler():
                         #     ravdb.update_subgraph(subgraph, status="not_ready", optimized="False")
                             
                         elif counter['pending'] == 0 and counter['computing'] == 0 and counter['failed'] == 0 and counter['computed'] == 0:
-                            ravdb.update_subgraph(subgraph, status="computed")
+                            ravdb.update_subgraph(subgraph, status="computed",complexity=17)
                             assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
                             if assigned_client is not None:
                                 ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
@@ -692,14 +692,14 @@ async def run_scheduler():
                             assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
                             if assigned_client is not None:
                                 ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
-                            ravdb.update_subgraph(subgraph, status="not_ready", optimized="False", retry_attempts=0, complexity=5)
+                            ravdb.update_subgraph(subgraph, status="not_ready", optimized="False", retry_attempts=0, complexity=18)
 
                     # Add failed and pending case
                     elif subgraph.status == "failed" and counter['pending'] > 0:
                         assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
                         if assigned_client is not None:
                             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
-                        ravdb.update_subgraph(subgraph, status="not_ready", optimized="False")
+                        ravdb.update_subgraph(subgraph, status="not_ready", optimized="False",complexity=19)
 
 
         await sio.sleep(0.1)
