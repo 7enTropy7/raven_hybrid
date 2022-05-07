@@ -683,19 +683,19 @@ async def run_scheduler():
                                 temp_Queue.remove((queue_subgraph_id, queue_graph_id))
                         Queue = temp_Queue
 
-                    if subgraph.status == "computed":
-                        # if counter['computed'] == num_ops:
-                        #     assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
-                        #     if assigned_client is not None:
-                        #         ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
-                        if counter['pending'] > 0:
-                            assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
-                            if assigned_client is not None:
-                                ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
-                            ravdb.update_subgraph(subgraph, status="not_ready", optimized="False", retry_attempts=0, complexity=18)
+                    # if subgraph.status == "computed":
+                    #     # if counter['computed'] == num_ops:
+                    #     #     assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
+                    #     #     if assigned_client is not None:
+                    #     #         ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
+                    #     if counter['pending'] > 0:
+                    #         assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
+                    #         if assigned_client is not None:
+                    #             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
+                    #         ravdb.update_subgraph(subgraph, status="not_ready", optimized="False", retry_attempts=0, complexity=18)
 
                     # Add failed and pending case
-                    elif subgraph.status == "failed" and counter['pending'] > 0:
+                    if subgraph.status == "failed" and counter['pending'] > 0:
                         assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
                         if assigned_client is not None:
                             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
