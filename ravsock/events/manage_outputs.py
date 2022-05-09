@@ -113,14 +113,17 @@ async def op_completed(sid, data):
 
     op = ravdb.get_op(op_id)
 
+    subgraph_id = data["subgraph_id"]
+    graph_id = data["graph_id"]
+
     if data["status"] != "success":
         # Update op
         ravdb.update_op(
             op, outputs=None, status=OpStatus.FAILED, message=data["error"]
         )
-        subgraph = ravdb.get_subgraph(subgraph_id=op.subgraph_id, graph_id=op.graph_id)
+        subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
         ravdb.update_subgraph(subgraph, status="failed",complexity=21)
-        assigned_client = ravdb.get_assigned_client(subgraph.subgraph_id, subgraph.graph_id)
+        assigned_client = ravdb.get_assigned_client(subgraph_id, graph_id)
         if assigned_client is not None:
             ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
 
