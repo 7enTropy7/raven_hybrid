@@ -319,6 +319,12 @@ class DBManager(object):
         """
         return self.session.query(Client).filter(Client.status == 'connected').filter(Client.current_graph_id == graph_id).filter(Client.current_subgraph_id == subgraph_id).first()
 
+    def get_assigned_clients(self, subgraph_id, graph_id):
+        """
+        Get all assigned client by subgraph_id and graph_id
+        """
+        return self.session.query(Client).filter(Client.status == 'connected').filter(Client.current_graph_id == graph_id).filter(Client.current_subgraph_id == subgraph_id).all()
+
     def get_client_by_cid(self, cid):
         """
         Get an existing client by cid
