@@ -84,19 +84,21 @@ async def subgraph_completed(sid, results_dict):
 
             # subgraph_id = op.subgraph_id
     
-    client = ravdb.get_client_by_sid(sid)
-    subgraph_id = client.current_subgraph_id 
-    graph_id = client.current_graph_id
+    # client = ravdb.get_client_by_sid(sid)
+    # subgraph_id = client.current_subgraph_id 
+    # graph_id = client.current_graph_id
     
+    # subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
+    # if subgraph is None:
+    subgraph_id = results_dict["subgraph_id"]
+    graph_id = results_dict["graph_id"]
     subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
-    if subgraph is None:
-        subgraph_id = results_dict["subgraph_id"]
-        graph_id = results_dict["graph_id"]
-        subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
 
     ravdb.update_subgraph(subgraph, status="computed",complexity=20)
-    
-    ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
+
+    clients = ravdb.get_assigned_clients(subgraph_id, graph_id)
+    for client in clients:    
+        ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
 
     # Emit another op to this client
     await emit_op(sid)
@@ -123,9 +125,9 @@ async def op_completed(sid, data):
         )
         subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
         ravdb.update_subgraph(subgraph, status="failed",complexity=21)
-        assigned_client = ravdb.get_assigned_client(subgraph_id, graph_id)
-        if assigned_client is not None:
-            ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
+        assigned_clients = ravdb.get_assigned_clients(subgraph_id, graph_id)
+        for assigned_client in assigned_clients:
+            ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
 
     # Emit another op to this client
     await emit_op(sid)
@@ -135,7 +137,7 @@ def update_client_op_mapping(op_id, sid, status):
     client = ravdb.get_client_by_sid(sid)
     mapping = ravdb.find_client_op_mapping(client.id, op_id)
     ravdb.update_client_op_mapping(
-        mapping.id, status=status, response_time=datetime.datetime.now()
+        mapping.id, status=status, response_time=datetime.datetime.utcnow()
     )
 
 
