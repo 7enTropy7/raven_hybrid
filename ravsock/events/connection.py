@@ -67,7 +67,7 @@ async def create_client(cid, sid, client_type):
     else:
         print("existing client connected ")
         client = ravdb.update_client(
-            client, sid=sid, connected_at=datetime.datetime.now(), status="connected",
+            client, sid=sid, connected_at=datetime.datetime.utcnow(), status="connected",
             last_active_time=datetime.datetime.utcnow()
         )
 
@@ -117,7 +117,7 @@ async def disconnect(sid):
     client = ravdb.get_client_by_sid(sid=sid)
     if client is not None:
         ravdb.update_client(
-            client, status="disconnected", disconnected_at=datetime.datetime.now()
+            client, status="disconnected", disconnected_at=datetime.datetime.utcnow()
         )
 
         # Update client sid mapping
