@@ -18,7 +18,8 @@ def compute_subgraph(d):
     global client, timeoutId
     print("Received Subgraph : ",d["subgraph_id"]," of Graph : ",d["graph_id"])
     g.has_subgraph = True
-
+    subgraph_id = d["subgraph_id"]
+    graph_id = d["graph_id"]
     data = d["payloads"]
     results = []
     compute_success = True
@@ -41,7 +42,7 @@ def compute_subgraph(d):
         operation_type = index["op_type"]
         operator = index["operator"]
         if operation_type is not None and operator is not None:
-            result_payload = compute_locally(index)
+            result_payload = compute_locally(index, subgraph_id, graph_id)
             if result_payload is not None:
                 results.append(result_payload)
             else:
