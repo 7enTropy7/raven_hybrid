@@ -118,7 +118,7 @@ def compute_locally_bm(*args, **kwargs):
         return t2-t1
 
 # async 
-def compute_locally(payload):
+def compute_locally(payload, subgraph_id, graph_id):
 
     # print("Computing ",payload["operator"])
     # print('\n\nPAYLOAD: ',payload)
@@ -141,7 +141,7 @@ def compute_locally(payload):
                     g.ftp_client.download(download_path, os.path.basename(server_file_path))
                 except Exception as error:
                     print('Error: ', error)
-                    emit_error(payload, error)
+                    emit_error(payload, error, subgraph_id, graph_id)
 
                 value = load_data(download_path).tolist()
                 print('Loaded Data Value: ',value)
@@ -158,7 +158,7 @@ def compute_locally(payload):
             try:
                 values.append(g.outputs[payload['values'][i]['op_id']])
             except Exception as e:
-                emit_error(payload,e)
+                emit_error(payload,e, subgraph_id, graph_id)
 
     payload["values"] = values
 
@@ -235,7 +235,7 @@ def compute_locally(payload):
 
     except Exception as error:
         print('Error: ', error)
-        emit_error(payload, error)
+        emit_error(payload, error, subgraph_id, graph_id)
 
 
 def upload_result(payload, result):
@@ -256,7 +256,7 @@ def upload_result(payload, result):
     return file_path
     
 
-def emit_error(payload, error):
+def emit_error(payload, error, subgraph_id, graph_id):
     print("Emit Error")
     # print(payload)
     print(error)
@@ -268,7 +268,9 @@ def emit_error(payload, error):
             'error': error,
             'operator': payload["operator"],
             "op_id": payload["op_id"],
-            "status": "failure"
+            "status": "failure",
+            "subgraph_id": subgraph_id,
+            "graph_id": graph_id
     }), namespace="/client")
 
     # op = g.ops[payload["op_id"]]
