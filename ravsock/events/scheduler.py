@@ -405,11 +405,11 @@ async def update_client_status():
     while True:
         clients = ravdb.get_clients(status='connected')
         for client in clients:
-            # if (datetime.datetime.utcnow() - client.last_active_time).seconds > 200: # To be reduced.
-            #     ravdb.update_client(client, status="disconnected", reporting='ready', disconnected_at=datetime.datetime.utcnow())
-            #     assigned_subgraph = ravdb.get_subgraph(client.current_subgraph_id, client.current_graph_id)
-            #     if assigned_subgraph is not None:
-            #         ravdb.update_subgraph(assigned_subgraph, status="ready",complexity=666)
+            if (datetime.datetime.utcnow() - client.last_active_time).seconds > 200: # To be reduced.
+                ravdb.update_client(client, status="disconnected", reporting='ready', disconnected_at=datetime.datetime.utcnow())
+                assigned_subgraph = ravdb.get_subgraph(client.current_subgraph_id, client.current_graph_id)
+                if assigned_subgraph is not None:
+                    ravdb.update_subgraph(assigned_subgraph, status="ready",complexity=666)
 
             client_type = "/{}".format(client.type)
             await sio.emit("check_status",
