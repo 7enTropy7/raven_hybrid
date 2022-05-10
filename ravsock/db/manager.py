@@ -926,12 +926,14 @@ class DBManager(object):
         """
         graph_id = graph.id
         if graph.status != 'failed':
-            failed_ops = self.session.query(Op).filter(Op.graph_id == graph_id).filter(Op.status == 'failed').all()#, Op.message == 'values passed to tensor(values) must be a number/boolean/string or an array of numbers/booleans/strings, or a TypedArray')).all()
-            unique_subgraph_ids = []
-            for failed_op in failed_ops:
-                if failed_op.subgraph_id not in unique_subgraph_ids:
-                    unique_subgraph_ids.append(failed_op.subgraph_id)
-            return unique_subgraph_ids
+            # failed_ops = self.session.query(Op).filter(Op.graph_id == graph_id).filter(Op.status == 'failed').all()#, Op.message == 'values passed to tensor(values) must be a number/boolean/string or an array of numbers/booleans/strings, or a TypedArray')).all()
+            # unique_subgraph_ids = []
+            # for failed_op in failed_ops:
+            #     if failed_op.subgraph_id not in unique_subgraph_ids:
+            #         unique_subgraph_ids.append(failed_op.subgraph_id)
+            # return unique_subgraph_ids
+            failed_subgraphs = self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).filter(SubGraph.status == 'failed').all()
+            return failed_subgraphs
         else:
             return []
 
