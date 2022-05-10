@@ -623,11 +623,15 @@ async def run_scheduler():
                                     idle_client_time += client_time
                             prelim_times[idle_client.id] = idle_client_time
                         if bool(prelim_times):
-                            fastest_client_id = min(prelim_times, key=prelim_times.get)
-                            client = ravdb.get_client(id=fastest_client_id)
-                            ravdb.update_subgraph(subgraph, status='assigned',complexity=15)
-                            ravdb.update_client(client, reporting='busy', current_subgraph_id=subgraph.subgraph_id,
-                                                current_graph_id=subgraph.graph_id)
+                            previously_assigned_client = ravdb.get_assigned_client(subgraph_id=subgraph.subgraph_id, graph_id=subgraph.graph_id)
+                            if previously_assigned_client is not None:
+                                ravdb.update_subgraph(subgraph, status='assigned',complexity=150)
+                            else:
+                                fastest_client_id = min(prelim_times, key=prelim_times.get)
+                                client = ravdb.get_client(id=fastest_client_id)
+                                ravdb.update_subgraph(subgraph, status='assigned',complexity=15)
+                                ravdb.update_client(client, reporting='busy', current_subgraph_id=subgraph.subgraph_id,
+                                                    current_graph_id=subgraph.graph_id)
 
                         else:
                             print('\n\nNo idle clients')
