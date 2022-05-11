@@ -171,4 +171,4 @@ def load_data(path):
     """
     Load ndarray from file
     """
-    return np.load(path, allow_pickle=True)
+    return np.load(path)

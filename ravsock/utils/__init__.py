@@ -38,7 +38,7 @@ def save_data_to_file(data_id, data):
 
 def load_data_from_file(file_path):
     print("File path:", file_path)
-    x = np.load(file_path, allow_pickle=True)
+    x = np.load(file_path)
     return x
 
 

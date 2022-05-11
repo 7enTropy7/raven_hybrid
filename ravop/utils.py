@@ -55,16 +55,16 @@ class Singleton:
         return isinstance(inst, self._cls)
 
 
-def dump_data(data_id, value):
-    """
-    Dump ndarray to file
-    """
-    file_path = os.path.join(DATA_FILES_PATH, "data_{}.pkl".format(data_id))
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    value.dump(file_path)
-    return file_path
+# def dump_data(data_id, value):
+#     """
+#     Dump ndarray to file
+#     """
+#     file_path = os.path.join(DATA_FILES_PATH, "data_{}.pkl".format(data_id))
+#     if os.path.exists(file_path):
+#         os.remove(file_path)
+#     os.makedirs(os.path.dirname(file_path), exist_ok=True)
+#     value.dump(file_path)
+#     return file_path
 
 
 def copy_data(source, destination):
