@@ -38,7 +38,7 @@ def save_data_to_file(data_id, data):
 
 def load_data_from_file(file_path):
     print("File path:", file_path)
-    x = np.load(file_path)
+    x = np.load(file_path, allow_pickle=True)
     return x
 
 
@@ -74,7 +74,7 @@ def dump_data(data_id, value):
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    np.save(file_path, value, allow_pickle=False)
+    np.save(file_path, value)
     return file_path
 
 def dump_data_non_ftp(data_id, value, username):
@@ -85,7 +85,7 @@ def dump_data_non_ftp(data_id, value, username):
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    np.save(file_path, value, allow_pickle=False)
+    np.save(file_path, value)
     return file_path
 
 

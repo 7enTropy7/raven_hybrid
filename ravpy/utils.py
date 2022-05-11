@@ -164,11 +164,11 @@ def dump_data(op_id, value):
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    np.save(file_path, value, allow_pickle=False)
+    np.save(file_path, value)
     return file_path
 
 def load_data(path):
     """
     Load ndarray from file
     """
-    return np.load(path)
+    return np.load(path, allow_pickle=True)
