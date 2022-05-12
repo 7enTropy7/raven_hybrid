@@ -318,7 +318,7 @@ async def data_create(request):
             dtype = data['dtype']
             username = data['username']
             data = ravdb.create_data(dtype=dtype)
-            file_path = os.path.join(FTP_RAVOP_FILES_PATH, "{}/data_{}.npy".format(username,data.id))
+            file_path = os.path.join(FTP_RAVOP_FILES_PATH, "{}/data_{}.pkl".format(username,data.id))
             # Update file path
             ravdb.update_data(data, file_path=file_path)
             # Serialize db object

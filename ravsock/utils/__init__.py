@@ -9,6 +9,7 @@ import shutil
 import numpy as np
 from sqlalchemy.orm import class_mapper
 from sqlalchemy_utils import database_exists
+import pickle as pkl
 
 from ravpy.config import FTP_DOWNLOAD_FILES_FOLDER
 
@@ -38,8 +39,11 @@ def save_data_to_file(data_id, data):
 
 def load_data_from_file(file_path):
     print("File path:", file_path)
-    x = np.load(file_path, allow_pickle=True)
-    return x
+    # x = np.load(file_path)
+    f = open(file_path, 'rb')  
+    x = pkl.load(f)         
+    f.close() 
+    return np.array(x)
 
 
 def delete_data_file(data_id):
@@ -70,22 +74,28 @@ def dump_data(data_id, value):
     """
     Dump ndarray to file
     """
-    file_path = os.path.join(DATA_FILES_PATH, "data_{}.npy".format(data_id))
+    file_path = os.path.join(DATA_FILES_PATH, "data_{}.pkl".format(data_id))
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    np.save(file_path, value)
+    f = open(file_path, 'wb')   
+    pkl.dump(value, f)          
+    f.close() 
+    # np.save(file_path, value)#, allow_pickle=False)
     return file_path
 
 def dump_data_non_ftp(data_id, value, username):
     """
     Dump ndarray to file
     """
-    file_path = os.path.join(FTP_RAVOP_FILES_PATH, "{}/data_{}.npy".format(username,data_id))
+    file_path = os.path.join(FTP_RAVOP_FILES_PATH, "{}/data_{}.pkl".format(username,data_id))
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    np.save(file_path, value)
+    f = open(file_path, 'wb')   
+    pkl.dump(value, f)          
+    f.close() 
+    # np.save(file_path, value)#, allow_pickle=False)
     return file_path
 
 

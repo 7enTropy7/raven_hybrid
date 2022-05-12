@@ -5,6 +5,7 @@ import numpy as np
 import requests
 
 from .config import ENCRYPTION
+import pickle as pkl
 
 if ENCRYPTION:
     import tenseal as ts
@@ -160,15 +161,22 @@ def dump_data(op_id, value):
     """
     Dump ndarray to file
     """
-    file_path = os.path.join(FTP_TEMP_FILES_FOLDER, "temp_{}.npy".format(op_id))
+    file_path = os.path.join(FTP_TEMP_FILES_FOLDER, "temp_{}.pkl".format(op_id))
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    np.save(file_path, value)
+    f = open(file_path, 'wb')
+    pkl.dump(value, f)          
+    f.close()  
+    # np.save(file_path, value)#, allow_pickle=False)
     return file_path
 
 def load_data(path):
     """
     Load ndarray from file
     """
-    return np.load(path, allow_pickle=True)
+    # return np.load(path,allow_pickle=True)
+    f = open(path, 'rb')  
+    data = pkl.load(f)         
+    f.close()    
+    return np.array(data)

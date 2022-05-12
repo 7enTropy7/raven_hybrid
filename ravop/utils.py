@@ -8,6 +8,8 @@ import requests
 from .config import DATA_FILES_PATH, RAVSOCK_SERVER_URL, TEMP_FILES_PATH
 from .socket_client import SocketClient
 
+import pickle as pkl
+
 
 def save_data_to_file(data_id, data):
     """
@@ -55,16 +57,16 @@ class Singleton:
         return isinstance(inst, self._cls)
 
 
-def dump_data(data_id, value):
-    """
-    Dump ndarray to file
-    """
-    file_path = os.path.join(DATA_FILES_PATH, "data_{}.pkl".format(data_id))
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    value.dump(file_path)
-    return file_path
+# def dump_data(data_id, value):
+#     """
+#     Dump ndarray to file
+#     """
+#     file_path = os.path.join(DATA_FILES_PATH, "data_{}.pkl".format(data_id))
+#     if os.path.exists(file_path):
+#         os.remove(file_path)
+#     os.makedirs(os.path.dirname(file_path), exist_ok=True)
+#     value.dump(file_path)
+#     return file_path
 
 
 def copy_data(source, destination):
@@ -114,9 +116,12 @@ def dump_data(data_id, value):
     """
     Dump ndarray to file
     """
-    file_path = os.path.join(TEMP_FILES_PATH, "data_{}.npy".format(data_id))
+    file_path = os.path.join(TEMP_FILES_PATH, "data_{}.pkl".format(data_id))
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    np.save(file_path, value)
+    f = open(file_path, 'wb')   
+    pkl.dump(value, f)          
+    f.close()   
+    # np.save(file_path, value)#, allow_pickle=False)
     return file_path

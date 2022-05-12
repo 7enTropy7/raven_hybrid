@@ -4,6 +4,7 @@ from requests import delete
 
 from ..config import FTP_SERVER_URL
 from ..globals import g
+import numpy as np
 
 
 class FTPClient:

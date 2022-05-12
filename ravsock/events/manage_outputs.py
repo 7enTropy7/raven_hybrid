@@ -71,7 +71,7 @@ async def subgraph_completed(sid, results_dict):
 
                 temp_file_path = file_path_dir + temp_file_name
 
-                new_file_path = file_path_dir + 'data_' + str(data_obj.id) + '.npy' 
+                new_file_path = file_path_dir + 'data_' + str(data_obj.id) + '.pkl' 
 
                 os.rename(temp_file_path, new_file_path)
 
