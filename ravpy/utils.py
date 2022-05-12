@@ -175,8 +175,6 @@ def load_data(path):
     """
     Load ndarray from file
     """
-    # return np.load(path,allow_pickle=True)
-    f = open(path, 'rb')  
-    data = pkl.load(f)         
-    f.close()    
+    with open(path, 'rb') as f:
+        data = pkl.load(f)         
     return np.array(data)
