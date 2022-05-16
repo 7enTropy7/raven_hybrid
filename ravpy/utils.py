@@ -165,10 +165,8 @@ def dump_data(op_id, value):
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    f = open(file_path, 'wb')
-    pkl.dump(value, f)          
-    f.close()  
-    # np.save(file_path, value)#, allow_pickle=False)
+    with open(file_path, 'wb') as f:
+        pkl.dump(value, f)
     return file_path
 
 def load_data(path):
