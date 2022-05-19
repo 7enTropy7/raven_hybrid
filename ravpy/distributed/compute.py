@@ -123,59 +123,59 @@ def compute_locally(payload, subgraph_id, graph_id):
     # print("Computing ",payload["operator"])
     # print('\n\nPAYLOAD: ',payload)
 
-    values = []
-    
-
-    for i in range(len(payload["values"])):
-        if "value" in payload["values"][i].keys():
-            # print("From server")
-            if "path" not in payload["values"][i].keys():
-                values.append(payload["values"][i]["value"])
-            
-            else:
-                server_file_path = payload["values"][i]["path"]
-
-                download_path = os.path.join(FTP_DOWNLOAD_FILES_FOLDER,os.path.basename(payload["values"][i]["path"]))
-
-                # try:
-                g.ftp_client.download(download_path, os.path.basename(server_file_path))
-                # except Exception as error:
-                #     print('Error: ', error)
-                #     emit_error(payload, error, subgraph_id, graph_id)
-
-                value = load_data(download_path).tolist()
-                print('Loaded Data Value: ',value)
-                values.append(value)
-
-                if os.path.basename(server_file_path) not in g.delete_files_list and payload["values"][i]["to_delete"] == 'True':
-                    g.delete_files_list.append(os.path.basename(server_file_path))
-
-                if os.path.exists(download_path):
-                    os.remove(download_path)
-
-        elif "op_id" in payload["values"][i].keys():
-            # print("From client")
-            try:
-                values.append(g.outputs[payload['values'][i]['op_id']])
-            except Exception as e:
-                emit_error(payload,e, subgraph_id, graph_id)
-
-    payload["values"] = values
-
-    # print("Payload Values: ", payload["values"])
-
-    op_type = payload["op_type"]
-    operator = payload["operator"]
-    params=payload['params']
-    param_string=""
-    for i in params.keys():
-        if type(params[i]) == str:
-            param_string+=","+i+"=\'"+str(params[i])+"\'"
-        else:
-            param_string+=","+i+"="+str(params[i])
-
-
     try:
+
+        values = []
+        
+        for i in range(len(payload["values"])):
+            if "value" in payload["values"][i].keys():
+                # print("From server")
+                if "path" not in payload["values"][i].keys():
+                    values.append(payload["values"][i]["value"])
+                
+                else:
+                    server_file_path = payload["values"][i]["path"]
+
+                    download_path = os.path.join(FTP_DOWNLOAD_FILES_FOLDER,os.path.basename(payload["values"][i]["path"]))
+
+                    # try:
+                    g.ftp_client.download(download_path, os.path.basename(server_file_path))
+                    # except Exception as error:
+                    #     print('Error: ', error)
+                    #     emit_error(payload, error, subgraph_id, graph_id)
+
+                    value = load_data(download_path).tolist()
+                    print('Loaded Data Value: ',value)
+                    values.append(value)
+
+                    if os.path.basename(server_file_path) not in g.delete_files_list and payload["values"][i]["to_delete"] == 'True':
+                        g.delete_files_list.append(os.path.basename(server_file_path))
+
+                    if os.path.exists(download_path):
+                        os.remove(download_path)
+
+            elif "op_id" in payload["values"][i].keys():
+                # print("From client")
+                # try:
+                values.append(g.outputs[payload['values'][i]['op_id']])
+                # except Exception as e:
+                #     emit_error(payload,e, subgraph_id, graph_id)
+
+        payload["values"] = values
+
+        # print("Payload Values: ", payload["values"])
+
+        op_type = payload["op_type"]
+        operator = payload["operator"]
+        params=payload['params']
+        param_string=""
+        for i in params.keys():
+            if type(params[i]) == str:
+                param_string+=","+i+"=\'"+str(params[i])+"\'"
+            else:
+                param_string+=","+i+"="+str(params[i])
+
+
         if op_type == "unary":
             value1 = payload["values"][0]
             short_name = get_key(operator,functions)
