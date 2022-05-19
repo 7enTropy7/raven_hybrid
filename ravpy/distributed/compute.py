@@ -139,13 +139,13 @@ def compute_locally(payload, subgraph_id, graph_id):
 
                 try:
                     g.ftp_client.download(download_path, os.path.basename(server_file_path))
-                    value = load_data(download_path).tolist()
-                    print('Loaded Data Value: ',value)
-                    values.append(value)
-
                 except Exception as error:
                     print('Error: ', error)
                     emit_error(payload, error, subgraph_id, graph_id)
+
+                value = load_data(download_path).tolist()
+                print('Loaded Data Value: ',value)
+                values.append(value)
 
                 if os.path.basename(server_file_path) not in g.delete_files_list and payload["values"][i]["to_delete"] == 'True':
                     g.delete_files_list.append(os.path.basename(server_file_path))
@@ -282,6 +282,13 @@ def emit_error(payload, error, subgraph_id, graph_id):
         for ftp_file in g.delete_files_list:
             g.ftp_client.delete_file(ftp_file)
     except Exception as e:
+        client.emit("op_completed", json.dumps({
+            'op_type': payload["op_type"],
+            'error': error,
+            'operator': payload["operator"],
+            "op_id": payload["op_id"],
+            "status": "failure"
+            }), namespace="/client")
 
         g.delete_files_list = []
         g.outputs = {}
