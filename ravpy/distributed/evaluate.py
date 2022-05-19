@@ -22,7 +22,8 @@ def compute_subgraph(d):
     graph_id = d["graph_id"]
     data = d["payloads"]
     results = []
-    compute_success = True
+    g.error = False
+    # compute_success = True
     for index in data:
         # g.ops[index["op_id"]] = {
         #     "id": index["op_id"],
@@ -43,15 +44,22 @@ def compute_subgraph(d):
         operator = index["operator"]
         if operation_type is not None and operator is not None:
             result_payload = compute_locally(index, subgraph_id, graph_id)
-            if result_payload is not None:
+            
+            if not g.error:
                 results.append(result_payload)
             else:
-                compute_success = False
                 break
+
+            # if result_payload is not None:
+            #     results.append(result_payload)
+            # else:
+            #     compute_success = False
+            #     break
 
         # stopTimer(timeoutId)
         # timeoutId = setTimeout(waitInterval,opTimeout)  
-    if compute_success:
+    # if compute_success:
+    if not g.error:
         emit_result_data = {"subgraph_id": d["subgraph_id"],"graph_id":d["graph_id"],"results":results}
         client.emit("subgraph_completed", json.dumps(emit_result_data), namespace="/client")
         print('Emitted subgraph_completed')
