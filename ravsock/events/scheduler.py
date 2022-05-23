@@ -147,9 +147,10 @@ async def vertical_split(graph_id):
 
                 for op_id in op_ids:
                     op = ravdb.get_op(op_id)
-                    if op.inputs != "null":
-                        for input_id in ast.literal_eval(op.inputs):    
-                            G.add_edge(input_id, op_id)
+                    if op.status != "computed":
+                        if op.inputs != "null":
+                            for input_id in ast.literal_eval(op.inputs):    
+                                G.add_edge(input_id, op_id)
 
                 subsubgraphs = list(nx.weakly_connected_components(G))
                 subsubgraphs = [list(x) for x in subsubgraphs]

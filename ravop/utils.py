@@ -56,19 +56,6 @@ class Singleton:
     def __instancecheck__(self, inst):
         return isinstance(inst, self._cls)
 
-
-# def dump_data(data_id, value):
-#     """
-#     Dump ndarray to file
-#     """
-#     file_path = os.path.join(DATA_FILES_PATH, "data_{}.pkl".format(data_id))
-#     if os.path.exists(file_path):
-#         os.remove(file_path)
-#     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-#     value.dump(file_path)
-#     return file_path
-
-
 def copy_data(source, destination):
     try:
         shutil.copy(source, destination)
@@ -120,8 +107,6 @@ def dump_data(data_id, value):
     if os.path.exists(file_path):
         os.remove(file_path)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    f = open(file_path, 'wb')   
-    pkl.dump(value, f)          
-    f.close()   
-    # np.save(file_path, value)#, allow_pickle=False)
+    with open(file_path, "wb") as f:
+        pkl.dump(value, f)
     return file_path
