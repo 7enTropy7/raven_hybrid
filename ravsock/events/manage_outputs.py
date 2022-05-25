@@ -126,8 +126,12 @@ async def op_completed(sid, data):
         subgraph = ravdb.get_subgraph(subgraph_id=subgraph_id, graph_id=graph_id)
         ravdb.update_subgraph(subgraph, status="failed",complexity=21)
         assigned_clients = ravdb.get_assigned_clients(subgraph_id, graph_id)
-        for assigned_client in assigned_clients:
-            ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
+        if 'broken pipe' in data["error"].lower():
+            for client in assigned_clients:
+                ravdb.update_client(client, reporting="broken_pipe", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())            
+        else:    
+            for assigned_client in assigned_clients:
+                ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
 
 
     # Emit another op to this client

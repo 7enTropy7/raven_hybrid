@@ -3,6 +3,7 @@ from distutils.log import error
 import os
 import numpy as np
 import json
+import sys
 import time
 #import tensorflow
 from scipy import stats
@@ -236,6 +237,10 @@ def compute_locally(payload, subgraph_id, graph_id):
 
     except Exception as error:
         print('Error: ', error)
+        if 'broken pipe' in str(error).lower():
+            print('\n\nYou have encountered an IO based Broken Pipe Error. \nRestart terminal and try connecting again')
+            sys.exit()
+
         emit_error(payload, error, subgraph_id, graph_id)
 
 

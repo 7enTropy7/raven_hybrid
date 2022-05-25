@@ -67,7 +67,7 @@ async def create_client(cid, sid, client_type):
     else:
         print("existing client connected ")
         client = ravdb.update_client(
-            client, sid=sid, connected_at=datetime.datetime.utcnow(), status="connected",
+            client, sid=sid, connected_at=datetime.datetime.utcnow(), status="connected", reporting="ready", current_subgraph_id=None, current_graph_id=None,
             last_active_time=datetime.datetime.utcnow()
         )
 
@@ -79,10 +79,16 @@ async def create_client(cid, sid, client_type):
             for subgraph_op in subgraph_ops:
                 if subgraph_op.status != "computed":
                     ravdb.update_op(subgraph_op, status="pending")
-            if client.reporting == "ready":
-                ravdb.update_client(client, current_subgraph_id=None, current_graph_id=None)
-            else:
-                ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
+            
+            # if client.reporting == "idle":
+            #     ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
+            # else:
+            #     ravdb.update_client(client, reporting="ready", current_subgraph_id=None, current_graph_id=None)
+
+            # if client.reporting == "ready":
+            #     ravdb.update_client(client, current_subgraph_id=None, current_graph_id=None)
+            # else:
+            #     ravdb.update_client(client, reporting="idle", current_subgraph_id=None, current_graph_id=None)
             
         # Update sid
         client_sid_mapping = ravdb.find_client_sid_mapping(cid=cid, sid=sid)

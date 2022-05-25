@@ -411,6 +411,10 @@ async def update_client_status():
                 assigned_subgraph = ravdb.get_subgraph(client.current_subgraph_id, client.current_graph_id)
                 if assigned_subgraph is not None:
                     ravdb.update_subgraph(assigned_subgraph, status="ready",complexity=666)
+                    subgraph_ops = ravdb.get_subgraph_ops(graph_id=assigned_subgraph.graph_id, subgraph_id=assigned_subgraph.subgraph_id)
+                    for subgraph_op in subgraph_ops:
+                        if subgraph_op.status != "computed":
+                            ravdb.update_op(subgraph_op, status="pending")
 
             client_type = "/{}".format(client.type)
             await sio.emit("check_status",
