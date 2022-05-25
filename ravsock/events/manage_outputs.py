@@ -8,7 +8,7 @@ import numpy as np
 
 from ravsock.encryption import load_context
 from ravsock.utils.strings import SubgraphStatus
-from .scheduler import emit_op
+from .scheduler import emit_op, retry_failed_subgraphs
 from ..config import CONTEXT_FOLDER, PARAMS_FOLDER, FTP_RAVOP_FILES_PATH
 from ..db import ravdb
 from ..ftp import get_client
@@ -118,7 +118,7 @@ async def op_completed(sid, data):
     subgraph_id = data["subgraph_id"]
     graph_id = data["graph_id"]
 
-    if data["status"] != "success":
+    if data["status"] != "success": #failure
         # Update op
         ravdb.update_op(
             op, outputs=None, status=OpStatus.FAILED, message=data["error"]
@@ -133,6 +133,8 @@ async def op_completed(sid, data):
             for assigned_client in assigned_clients:
                 ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
 
+        await retry_failed_subgraphs(graph_id)
+        await sio.sleep(0.1)    
 
     # Emit another op to this client
     await emit_op(sid)
