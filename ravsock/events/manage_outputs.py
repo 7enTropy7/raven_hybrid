@@ -133,8 +133,8 @@ async def op_completed(sid, data):
             for assigned_client in assigned_clients:
                 ravdb.update_client(assigned_client, reporting="idle", current_subgraph_id=None, current_graph_id=None, last_active_time=datetime.datetime.utcnow())
 
-        await retry_failed_subgraphs(graph_id)
-        await sio.sleep(0.1)    
+        # await retry_failed_subgraphs(graph_id)
+        # await sio.sleep(0.1)    
 
     # Emit another op to this client
     await emit_op(sid)
