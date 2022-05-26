@@ -879,10 +879,11 @@ class DBManager(object):
         Get last 30 subgraphs belonging to a graph
         """
         last_element = self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).order_by(SubGraph.id.desc()).first()
-        if last_element.id > 30:
-            return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).order_by(SubGraph.id.desc()).limit(30).order_by(SubGraph.id.asc()).all()
-        else:
-            return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).all()
+        if last_element is not None:
+            if last_element.id > 30:
+                return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).order_by(SubGraph.id.desc()).limit(30)[::-1]
+        
+        return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).all()
     
     def get_horizontal_split_subgraphs(self, graph_id):
         """
@@ -942,7 +943,7 @@ class DBManager(object):
             #     if failed_op.subgraph_id not in unique_subgraph_ids:
             #         unique_subgraph_ids.append(failed_op.subgraph_id)
             # return unique_subgraph_ids
-            failed_subgraphs = self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).order_by(SubGraph.id.desc()).limit(30).filter(SubGraph.status == 'failed').order_by(SubGraph.id.asc()).all()
+            failed_subgraphs = self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).filter(SubGraph.status == 'failed').order_by(SubGraph.id.desc()).limit(30)[::-1]
             unique_subgraph_ids = []
             for failed_subgraph in failed_subgraphs:
                 if failed_subgraph.subgraph_id not in unique_subgraph_ids:
