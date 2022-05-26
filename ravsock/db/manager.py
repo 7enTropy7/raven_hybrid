@@ -878,7 +878,11 @@ class DBManager(object):
         """
         Get last 30 subgraphs belonging to a graph
         """
-        return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).order_by(SubGraph.id.desc()).limit(30).order_by(SubGraph.id.asc()).all()
+        last_element = self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).order_by(SubGraph.id.desc()).first()
+        if last_element.id > 30:
+            return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).order_by(SubGraph.id.desc()).limit(30).order_by(SubGraph.id.asc()).all()
+        else:
+            return self.session.query(SubGraph).filter(SubGraph.graph_id == graph_id).all()
     
     def get_horizontal_split_subgraphs(self, graph_id):
         """
