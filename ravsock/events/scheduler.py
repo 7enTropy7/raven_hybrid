@@ -643,7 +643,7 @@ async def run_scheduler():
                     else:
                         print('\nNo idle clients')
 
-                subgraphs = ravdb.get_all_subgraphs(graph_id=current_graph_id)
+                subgraphs = ravdb.get_last_30_subgraphs(graph_id=current_graph_id)
                 if len(subgraphs) > 30:
                     subgraphs = subgraphs[-30:]
                 for subgraph in subgraphs:
