@@ -2,6 +2,7 @@ from .globals import g
 
 def initialize(ravenverse_token, username):
 
+    g.ravenverse_token = ravenverse_token
     '''Add Token Authorization code here.'''
 
     g.cid = username

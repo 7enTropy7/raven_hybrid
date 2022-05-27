@@ -4,8 +4,11 @@ from aiohttp import web
 
 from ..config import DEFAULT_HEADERS, PROJECT_DIR
 
+from .auth_decorator import authenticate_token
+
 
 @asyncio.coroutine
+@authenticate_token
 def get_benchmark_ops(request):
     """
     Return the json file containing benchmark ops

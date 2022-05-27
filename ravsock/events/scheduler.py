@@ -7,7 +7,7 @@ import os
 import shutil
 import threading
 import networkx as nx
-from ravop import GraphStatus, OpStatus
+from ravsock.utils import GraphStatus, OpStatus
 
 from ravsock.config import QUEUE_OPS, QUEUE_CLIENTS, SCHEDULER_RUNNING
 from ravsock.db import ravdb, RavQueue

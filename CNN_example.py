@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 
 import ravop as R
 
-R.initialize('cnn_test')
+R.initialize(ravenverse_token='<ravenverse_token>',username='cnn_test')
 algo = R.Graph(name='cnn', algorithm='convolutional_neural_network', approach='distributed')
 
 def to_categorical(x, n_col=None):

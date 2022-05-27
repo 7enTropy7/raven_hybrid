@@ -7,7 +7,7 @@ import threading
 from urllib import request
 import requests
 import paramiko
-from ravop import MappingStatus
+from ..utils import MappingStatus
 from sqlalchemy import or_
 
 from ravsock.db import ravdb, ClientOpMapping, ObjectiveClientMapping
@@ -19,11 +19,12 @@ from ..config import FTP_SERVER_URL, FTP_SERVER_USERNAME, FTP_SERVER_PASSWORD, F
     FTP_SERVER_DIR, FTP_ENVIRON_DIR, FLASK_SERVER_URL
 from ..globals import globals as g
 from ..utils import get_random_string
+from ..handlers.auth_decorator import socketio_authenticate_token
 
 sio = g.sio
 
-
-async def connect(sid, environ):
+@socketio_authenticate_token
+async def connect(sid, environ, auth):
     from urllib import parse
     ps = parse.parse_qs(environ["QUERY_STRING"])
     # print(ps)

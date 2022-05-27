@@ -32,6 +32,8 @@ from ..utils import get_random_string
 from ..config import FTP_SERVER_URL, FTP_SERVER_USERNAME, FTP_SERVER_PASSWORD, FTP_SERVER_LOCATION, \
     FTP_SERVER_DIR, FTP_ENVIRON_DIR
 
+from .auth_decorator import authenticate_token
+
 # from ravop.core import t
 
 # ----- Utils -----
@@ -57,6 +59,7 @@ def serialize(model):
 # ------ OPS ENDPOINTS ------
 
 # We can define aiohttp endpoints just as we normally would with no change
+@authenticate_token
 async def load_worker(request):
     response = aiohttp_jinja2.render_template('worker.html',
                                               request,
@@ -68,7 +71,7 @@ async def load_worker(request):
     with open("static/worker.html") as f:
         return web.Response(text=f.read(), content_type="text/html")
 
-
+@authenticate_token
 async def op_create(request):
     # http://localhost:9999/op/create/?name=None&graph_id=None&node_type=input&inputs=null&outputs=[1]&op_type=other&operator=linear&status=computed&params={}
     """
@@ -116,7 +119,7 @@ async def op_create(request):
     #         {"message": "Unable to create op"}, content_type="text/html", status=400
     #     )
 
-
+@authenticate_token
 async def op_get(request):
     # http://localhost:9999/op/get/?id=3
     """
@@ -142,7 +145,7 @@ async def op_get(request):
             {"message": "Invalid op id"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def op_get_by_name(request):
     # http://localhost:9999/op/get/name/?op_name="None"&id="None"
     """
@@ -174,7 +177,7 @@ async def op_get_by_name(request):
             status=400,
         )
 
-
+@authenticate_token
 async def op_get_all(request):
     # http://localhost:9999/op/get/all
     """
@@ -212,7 +215,7 @@ async def op_get_all(request):
             {"message": "Unable to get all Ops"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def op_status(request):
     # http://localhost:9999/op/status/?id=3
     """
@@ -233,6 +236,7 @@ async def op_status(request):
             {"op_status": op.status}, content_type="application/json", status=200
         )
 
+@authenticate_token
 async def op_delete(request):
     # http://localhost:9999/op/delete/?id=1
     """
@@ -268,6 +272,7 @@ async def op_delete(request):
 
 
 # op_get_my_graph_id
+@authenticate_token
 async def op_get_my_graph_id(request):
     # http://localhost:9999/op/get_my_graph_id/?op_id=3
     """
@@ -291,7 +296,7 @@ async def op_get_my_graph_id(request):
 
 # ------ DATA ENDPOINTS ------
 
-
+@authenticate_token
 async def data_create(request):
     # http://localhost:9999/data/create/
     """
@@ -338,7 +343,7 @@ async def data_create(request):
             {"message": "Unable to create Data"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def data_get(request):
     # http://localhost:9999/data/get?id=1
     """
@@ -381,7 +386,7 @@ async def data_get(request):
     #         {"message": "Invalid Data id"}, content_type="text/html", status=400
     #     )
 
-
+@authenticate_token
 async def data_get_data(request):
     # http://localhost:9999/data/get/data/?id=1
     """
@@ -409,7 +414,7 @@ async def data_get_data(request):
             {"message": "Invalid Data id"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def data_delete(request):
     # http://localhost:9999/data/delete/?id=1
 
@@ -436,7 +441,7 @@ async def data_delete(request):
 
 # ------ GRAPH ENDPOINTS ------
 
-
+@authenticate_token
 async def graph_create(request):
     # http://localhost:9999/graph/create/
     try:
@@ -473,6 +478,7 @@ async def graph_create(request):
             {"message": "Unable to create Graph"}, content_type="text/html", status=400
         )
 
+@authenticate_token
 async def graph_get_last_graph_id(request):
     # http://localhost:9999/graph/get/graph_id
     """
@@ -500,7 +506,7 @@ async def graph_get_last_graph_id(request):
             {"message": "Failed to Fetch Latest Graph_id"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def graph_get(request):
     # http://localhost:9999/graph/get/?id=1
     """
@@ -538,6 +544,7 @@ async def graph_get(request):
 
 
 @asyncio.coroutine
+@authenticate_token
 async def graph_get_all(request):
     # http://localhost:9999/graph/get/all
     """
@@ -570,6 +577,7 @@ async def graph_get_all(request):
             status=400
         )
 
+@authenticate_token
 async def graph_op_dependency_get(request):
     # http://localhost:9999/graph/op_dependency/get/?id=1
     """
@@ -600,7 +608,7 @@ async def graph_op_dependency_get(request):
             {"message": "Invalid Graph id"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def graph_op_get(request):
     # http://localhost:9999/graph/op/get/?id=1
     """
@@ -639,7 +647,7 @@ async def graph_op_get(request):
             {"message": "Invalid Graph id"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def graph_op_name_get(request):
     # http://localhost:9999/graph/op/name/get/?op_name=""&id=1
 
@@ -676,6 +684,7 @@ async def graph_op_name_get(request):
             status=400
         )
 
+@authenticate_token
 async def graph_op_get_stats(request):
     # http://localhost:9999/graph/op/get/stats/?id=4
     """
@@ -707,7 +716,7 @@ async def graph_op_get_stats(request):
             {"message": "Invalid Graph id"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def graph_get_progress(request):
     # http://localhost:9999/graph/op/get/progress/?id=4
 
@@ -748,7 +757,7 @@ async def graph_get_progress(request):
             {"message": "Invalid Graph id"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def graph_end(request):
     # http://localhost:9999/graph/end/?id=4
 
@@ -797,7 +806,7 @@ async def graph_end(request):
             {"message": "Invalid Graph id"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def graph_delete(request):
     # http://localhost:9999/graph/delete/?id=1
     """
@@ -834,7 +843,7 @@ async def graph_delete(request):
 
 
 # SUBGRAPH ENDPOINTS
-
+@authenticate_token
 async def post_subgraph_op_mappings(request):
     # http://localhost:9999/subgraph/op/mappings
     try:
@@ -886,7 +895,7 @@ async def post_subgraph_op_mappings(request):
             {"message": "Unable to create SubGraph-Op-Mappings"}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def get_ftp_credentials(request):
     """
     Get ftp credentials for a particular client
@@ -923,7 +932,7 @@ async def update_graph_client_mapping(request):
             {"message": "Error:{}".format(str(e))}, content_type="text/html", status=400
         )
 
-
+@authenticate_token
 async def subgraph_ops_get(request):
     try:
         graph_id = request.rel_url.query['graph_id']
@@ -953,6 +962,7 @@ async def subgraph_ops_get(request):
             {"message": "Error:{}".format(str(e))}, content_type="text/html", status=400
         )
 
+@authenticate_token
 async def update_global_subgraph_id(request):
     '''
         /global/subgraph/update/id/?graph_id=1
@@ -977,12 +987,12 @@ async def update_global_subgraph_id(request):
         )
 
 # ------------- Ravop User Creation Endpoint for FTP --------------------- #
-
+@authenticate_token
 async def add_developer(request):
     '''
-        /ravop/developer/add/?token=1
+        /ravop/developer/add/?username=1
     '''
-    username = request.rel_url.query['token']
+    username = request.rel_url.query['username']
     password = get_random_string(10)
     print("Password:", password)
     if FTP_SERVER_LOCATION == "LOCAL":
