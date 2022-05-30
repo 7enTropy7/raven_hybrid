@@ -552,8 +552,8 @@ async def run_scheduler():
                 await horizontal_split(distributed_graph.id)
                 await sio.sleep(0.1)
 
-                await retry_failed_subgraphs(distributed_graph.id)
-                await sio.sleep(0.1)
+                # await retry_failed_subgraphs(distributed_graph.id)
+                # await sio.sleep(0.1)
                 
                 failed_subgraph_ids = get_failed_subgraphs_from_queue(current_graph_id)
                 
