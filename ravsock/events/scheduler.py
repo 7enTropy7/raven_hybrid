@@ -552,8 +552,11 @@ async def run_scheduler():
                 await horizontal_split(distributed_graph.id)
                 await sio.sleep(0.1)
 
-                # await retry_failed_subgraphs(distributed_graph.id)
-                # await sio.sleep(0.1)
+                if_failed_subgraph = ravdb.get_if_failed_from_graph(distributed_graph.id)
+                if if_failed_subgraph is not None:
+                    await retry_failed_subgraphs(distributed_graph.id)
+                    await sio.sleep(0.1)
+                    ravdb.update_graph(distributed_graph, failed_subgraph = "False")
                 
                 failed_subgraph_ids = get_failed_subgraphs_from_queue(current_graph_id)
                 
