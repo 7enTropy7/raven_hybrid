@@ -1,4 +1,5 @@
 import datetime
+from email.policy import default
 
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
@@ -33,6 +34,8 @@ class Graph(Base):
 
     # Status of this graph 1. pending 2. computing 3. computed 4. failed
     status = Column(String(10), default="pending")
+
+    failed_subgraph = Column(Text, nullable=True, default="False")
 
     inactivity = Column(Integer, default=0)
 
