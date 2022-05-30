@@ -931,6 +931,9 @@ class DBManager(object):
                 SubGraph.status == 'computing',
                 SubGraph.status == 'assigned')).all()
 
+    def get_if_failed_from_graph(self, graph_id):
+        return self.session.query(Graph).filter(Graph.id == graph_id).filter(Graph.failed_subgraph == "True")
+
     def get_failed_subgraphs_from_graph(self, graph):
         """
         Get an existing subgraph
