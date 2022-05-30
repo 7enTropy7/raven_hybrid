@@ -68,7 +68,7 @@ async def create_client(cid, sid, client_type):
     else:
         print("existing client connected ")
         client = ravdb.update_client(
-            client, sid=sid, connected_at=datetime.datetime.utcnow(), status="connected", reporting="ready", current_subgraph_id=None, current_graph_id=None,
+            client, sid=sid, connected_at=datetime.datetime.utcnow(), status="connected", reporting="ready",
             last_active_time=datetime.datetime.utcnow()
         )
 
