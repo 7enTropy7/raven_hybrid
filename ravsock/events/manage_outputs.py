@@ -137,6 +137,10 @@ async def op_completed(sid, data):
         # await sio.sleep(0.1)    
 
     # Emit another op to this client
+    await sio.sleep(0.1)
+    await retry_failed_subgraphs(graph_id=graph_id)#distributed_graph.id)
+    await sio.sleep(0.1)
+
     await emit_op(sid)
 
 
