@@ -1,6 +1,7 @@
 import socketio
 import time
 import ast
+import os
 
 from .config import SOCKET_SERVER_HOST, SOCKET_SERVER_PORT, TYPE
 from .singleton_utils import Singleton
@@ -9,6 +10,13 @@ from .singleton_utils import Singleton
 def get_client(cid, ravenverse_token):
     auth_headers = {"Authorization" : ravenverse_token}
     client = socketio.Client(logger=False, request_timeout=60)
+
+    @client.on('error',namespace='/client')
+    def check_error(d):
+        print("\n======= Error: {} =======".format(d))
+        client.disconnect()
+        os._exit(1)
+
     try:
         client.connect(url="http://{}:{}?cid={}&type={}".format(SOCKET_SERVER_HOST, SOCKET_SERVER_PORT, cid, TYPE), 
                        auth=auth_headers,
