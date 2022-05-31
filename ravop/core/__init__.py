@@ -27,6 +27,10 @@ def initialize(ravenverse_token, username):
     create_endpoint = f"ravop/developer/add/?username={username}"
     res = make_request(create_endpoint, "get")
     res = res.json()
+    if 'Error' in res.keys():
+        print("Error: ", res['Error'])
+        os._exit(1)
+        
     username = res['username']
     password = res['password']
     time.sleep(2)
